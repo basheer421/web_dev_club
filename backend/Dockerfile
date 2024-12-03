@@ -17,10 +17,13 @@ COPY . .
 # Create media and static directories
 RUN mkdir -p media static
 
+# Create entrypoint script
+COPY ./entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
 # Run as non-root user
 RUN useradd -m myuser
 RUN chown -R myuser:myuser /app
 USER myuser
 
-# Command to run the application
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"] 
+ENTRYPOINT ["bash", "entrypoint.sh"]
