@@ -27,6 +27,10 @@ interface ProjectInPool {
   project: Project;
   status: string;
   created_at: string;
+  submitted_by: {
+    id: number;
+    username: string;
+  };
 }
 
 const Dashboard: React.FC = () => {
