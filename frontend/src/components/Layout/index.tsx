@@ -1,7 +1,21 @@
 import React, { ReactNode } from 'react';
-import { Box, AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Container,
+  Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Divider,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useState } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,26 +24,92 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+    handleClose();
   };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static">
+      <AppBar position="static" elevation={1} sx={{ bgcolor: 'white', color: 'text.primary' }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography 
+            variant="h6" 
+            component="div" 
+            sx={{ 
+              flexGrow: 1, 
+              fontWeight: 'bold',
+              color: 'primary.main'
+            }}
+          >
             DevClub
           </Typography>
           {user && (
             <>
-              <Button color="inherit" onClick={() => navigate('/')}>Dashboard</Button>
-              <Button color="inherit" onClick={() => navigate('/projects')}>Projects</Button>
-              <Button color="inherit" onClick={() => navigate('/profile')}>Profile</Button>
-              <Button color="inherit" onClick={() => navigate('/submit-project')}>Submit Project</Button>
-              <Button color="inherit" onClick={handleLogout}>Logout</Button>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/')}
+                  sx={{ color: 'text.primary' }}
+                >
+                  Dashboard
+                </Button>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/projects')}
+                  sx={{ color: 'text.primary' }}
+                >
+                  Projects
+                </Button>
+                <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                <IconButton
+                  onClick={handleMenu}
+                  size="small"
+                  sx={{ ml: 2 }}
+                >
+                  {user.profile_picture ? (
+                    <Avatar 
+                      src={user.profile_picture}
+                      sx={{ width: 32, height: 32 }}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )}
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                >
+                  <MenuItem onClick={() => { navigate('/profile'); handleClose(); }}>
+                    Profile
+                  </MenuItem>
+                  <MenuItem onClick={() => { navigate('/settings'); handleClose(); }}>
+                    Settings
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                </Menu>
+              </Box>
             </>
           )}
         </Toolbar>
