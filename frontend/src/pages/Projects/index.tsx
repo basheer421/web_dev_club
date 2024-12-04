@@ -9,12 +9,17 @@ import {
   Box,
   Tabs,
   Tab,
-  Link,
+  Paper,
   Chip,
+  Link,
+  CircularProgress,
 } from '@mui/material';
 import Layout from '../../components/Layout';
 import api from '../../services/api';
 import { Project, ProjectSubmission } from '../../types';
+import { useAuth } from '../../contexts/AuthContext';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -33,6 +38,7 @@ function TabPanel(props: TabPanelProps) {
 
 const Projects: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [projects, setProjects] = useState<Project[]>([]);
   const [mySubmissions, setMySubmissions] = useState<ProjectSubmission[]>([]);
@@ -57,7 +63,7 @@ const Projects: React.FC = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
@@ -75,12 +81,18 @@ const Projects: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Layout>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+          <CircularProgress />
+        </Box>
+      </Layout>
+    );
   }
 
   return (
     <Layout>
-      <Box sx={{ width: '100%' }}>
+      <Paper sx={{ width: '100%', mb: 2 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tabValue} onChange={handleTabChange}>
             <Tab label="Available Projects" />
@@ -97,21 +109,36 @@ const Projects: React.FC = () => {
                     <Typography variant="h6" gutterBottom>
                       {project.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      component="div"
+                      sx={{ mb: 2 }}
+                    >
                       {project.description}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Points Required: {project.points_required}
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      <Link href={project.pdf_file} target="_blank" rel="noopener">
-                        <Button variant="outlined" sx={{ mr: 1 }}>
-                          View PDF
-                        </Button>
-                      </Link>
+                    <Box sx={{ mb: 2 }}>
+                      <Chip 
+                        label={`${project.points_required} Points Required`}
+                        color="primary"
+                        size="small"
+                      />
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<PictureAsPdfIcon />}
+                        component={Link}
+                        href={project.pdf_file}
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        View PDF
+                      </Button>
                       <Button
                         variant="contained"
                         onClick={() => navigate(`/submit-project/${project.id}`)}
+                        disabled={user?.points ? user.points < project.points_required : true}
                       >
                         Submit Project
                       </Button>
@@ -139,21 +166,36 @@ const Projects: React.FC = () => {
                         size="small"
                       />
                     </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      GitHub: <Link href={submission.github_repo} target="_blank" rel="noopener">
-                        Repository
-                      </Link>
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 2 }}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<GitHubIcon />}
+                        component={Link}
+                        href={submission.github_repo}
+                        target="_blank"
+                        rel="noopener"
+                        size="small"
+                      >
+                        View Code
+                      </Button>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" component="div">
                       Submitted: {new Date(submission.created_at).toLocaleDateString()}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
             ))}
+            {mySubmissions.length === 0 && (
+              <Grid item xs={12}>
+                <Typography variant="body1" color="text.secondary" align="center">
+                  You haven't submitted any projects yet.
+                </Typography>
+              </Grid>
+            )}
           </Grid>
         </TabPanel>
-      </Box>
+      </Paper>
     </Layout>
   );
 };

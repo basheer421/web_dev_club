@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useState } from 'react';
+import PageTransition from '../PageTransition';
 
 interface LayoutProps {
   children: ReactNode;
@@ -115,7 +116,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </Toolbar>
       </AppBar>
       <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </Container>
     </Box>
   );

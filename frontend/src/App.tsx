@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './contexts/AuthContext';
 import AuthGuard from './components/AuthGuard';
+import { AnimatePresence } from 'motion/react';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -12,6 +13,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import EvaluationPage from './pages/EvaluationPage';
 import ProjectSubmission from './pages/ProjectSubmission';
+import Projects from './pages/Projects';
 
 const theme = createTheme({
   palette: {
@@ -26,12 +28,14 @@ const theme = createTheme({
 });
 
 const App: React.FC = () => {
+  const location = useLocation();
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <Router>
-          <Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={
               <AuthGuard>
@@ -58,9 +62,14 @@ const App: React.FC = () => {
                 <ProjectSubmission />
               </AuthGuard>
             } />
+            <Route path="/projects" element={
+              <AuthGuard>
+                <Projects />
+              </AuthGuard>
+            } />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </Router>
+        </AnimatePresence>
       </AuthProvider>
     </ThemeProvider>
   );
