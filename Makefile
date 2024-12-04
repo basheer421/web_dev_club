@@ -53,8 +53,7 @@ test:
 
 # Clean up everything
 clean:
-	docker compose down -v
-	docker system prune -f
+	docker system prune -a --volumes -f
 	find . -type d -name "__pycache__" -exec rm -r {} +
 	find . -type f -name "*.pyc" -delete
 
