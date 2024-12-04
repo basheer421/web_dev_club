@@ -27,4 +27,4 @@ class EvaluationSerializer(serializers.ModelSerializer):
         model = Evaluation
         fields = ['id', 'submission', 'evaluator', 'evaluator_username', 
                  'comments', 'is_approved', 'created_at']
-        read_only_fields = ('evaluator',) 
+        read_only_fields = ('evaluator', 'submission') 

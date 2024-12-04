@@ -44,32 +44,41 @@ class EvaluationView(generics.CreateAPIView):
     
     def perform_create(self, serializer):
         submission = ProjectSubmission.objects.get(pk=self.kwargs['pk'])
+        
+        # Check if user is trying to evaluate their own submission
+        if submission.submitted_by == self.request.user:
+            raise ValidationError("You cannot evaluate your own submission")
+            
         if submission.status != 'pending':
             raise ValidationError("This submission is already being evaluated")
         
-        serializer.save(
+        evaluation = serializer.save(
             evaluator=self.request.user,
             submission=submission
         )
+        
+        # Update submission status based on evaluation
+        submission.status = 'completed' if evaluation.is_approved else 'pending'
+        submission.save()
+        
+        if evaluation.is_approved:
+            # Increase submitter's level
+            submitter = submission.submitted_by
+            submitter.level += 1
+            submitter.save()
+        
+        # Give points to evaluator
         self.request.user.points += 1
         self.request.user.save()
 
-class EvaluationDetailView(generics.RetrieveUpdateAPIView):
-    queryset = Evaluation.objects.all()
-    serializer_class = EvaluationSerializer
+        return Response(EvaluationSerializer(evaluation).data)
+
+class EvaluationDetailView(generics.RetrieveAPIView):
+    serializer_class = ProjectSubmissionSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_update(self, serializer):
-        evaluation = serializer.save()
-        if evaluation.is_approved:
-            submission = evaluation.submission
-            submission.status = 'completed'
-            submission.save()
-            
-            # Increase level of the submitter if approved
-            user = submission.submitted_by
-            user.level += 1
-            user.save()
+    def get_object(self):
+        return ProjectSubmission.objects.get(pk=self.kwargs['pk'])
 
 class UserProjectSubmissionsView(generics.ListAPIView):
     """List all submissions by the current user"""

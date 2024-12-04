@@ -1,11 +1,200 @@
-import React from 'react';
-import Layout from '@/components/Layout';
-import { Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  TextField,
+  Button,
+  Chip,
+  Link,
+  CircularProgress,
+  Alert,
+  Card,
+  CardContent,
+  Divider,
+} from '@mui/material';
+import Layout from '../../components/Layout';
+import api from '../../services/api';
+import { ProjectSubmission } from '../../types';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const EvaluationPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [submission, setSubmission] = useState<ProjectSubmission | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [evaluation, setEvaluation] = useState({
+    comments: '',
+    is_approved: false,
+  });
+
+  useEffect(() => {
+    fetchSubmission();
+  }, [id]);
+
+  const fetchSubmission = async () => {
+    try {
+      const response = await api.get<ProjectSubmission>(`/projects/evaluation/${id}/`);
+      
+      // Check if the submission is the user's own
+      if (response.data.submitted_by.id === user?.id) {
+        setError("You cannot evaluate your own submission");
+        setSubmission(null);
+      } else {
+        setSubmission(response.data);
+      }
+    } catch (error) {
+      setError('Failed to load submission');
+      console.error('Error fetching submission:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (approved: boolean) => {
+    if (!evaluation.comments.trim()) {
+      setError('Please provide evaluation comments');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await api.post(`/projects/evaluate/${id}/`, {
+        comments: evaluation.comments.trim(),
+        is_approved: approved
+      });
+      navigate('/');
+    } catch (error: any) {
+      setError(error.response?.data?.detail || 'Failed to submit evaluation');
+      console.error('Error submitting evaluation:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Layout>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+          <CircularProgress />
+        </Box>
+      </Layout>
+    );
+  }
+
+  if (!submission) {
+    return (
+      <Layout>
+        <Alert severity="error">Submission not found</Alert>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <Typography variant="h4">Evaluation</Typography>
+      {error ? (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      ) : (
+        <Grid container spacing={3}>
+          {/* Project Details */}
+          <Grid item xs={12} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Project Details
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Typography variant="subtitle1" gutterBottom>
+                  {submission.project.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" paragraph>
+                  {submission.project.description}
+                </Typography>
+                <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<PictureAsPdfIcon />}
+                    component={Link}
+                    href={submission.project.pdf_file}
+                    target="_blank"
+                  >
+                    View Requirements
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Submission Details */}
+          <Grid item xs={12} md={8}>
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Submission by {submission.submitted_by.username}
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<GitHubIcon />}
+                  component={Link}
+                  href={submission.github_repo}
+                  target="_blank"
+                  sx={{ mt: 1 }}
+                >
+                  View Code Repository
+                </Button>
+              </Box>
+
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                label="Evaluation Comments"
+                value={evaluation.comments}
+                onChange={(e) => setEvaluation({ ...evaluation, comments: e.target.value })}
+                error={Boolean(error && !evaluation.comments.trim())}
+                helperText={error && !evaluation.comments.trim() ? error : ''}
+                sx={{ mb: 3 }}
+              />
+
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<CancelIcon />}
+                  onClick={() => handleSubmit(false)}
+                  disabled={submitting}
+                >
+                  Reject
+                </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<CheckCircleIcon />}
+                  onClick={() => handleSubmit(true)}
+                  disabled={submitting}
+                >
+                  Approve
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
     </Layout>
   );
 };

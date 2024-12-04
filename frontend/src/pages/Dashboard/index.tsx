@@ -57,7 +57,6 @@ const Dashboard: React.FC = () => {
 
   const handleEvaluate = async (projectId: number) => {
     try {
-      await api.post(`/projects/evaluate/${projectId}/`);
       navigate(`/evaluation/${projectId}`);
     } catch (error) {
       console.error('Error starting evaluation:', error);
@@ -186,9 +185,10 @@ const Dashboard: React.FC = () => {
                   variant="contained"
                   color="primary"
                   onClick={() => handleEvaluate(project.id)}
+                  disabled={project.submitted_by.id === user?.id}
                   sx={{ ml: 2, minWidth: 120 }}
                 >
-                  Evaluate
+                  {project.submitted_by.id === user?.id ? 'Your Submission' : 'Evaluate'}
                 </Button>
               </ListItem>
             </React.Fragment>
