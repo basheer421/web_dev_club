@@ -47,11 +47,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Toolbar>
           <Typography 
             variant="h6" 
-            component="div" 
+            component="div"
+            onClick={() => navigate('/')}
             sx={{ 
               flexGrow: 1, 
               fontWeight: 'bold',
-              color: 'primary.main'
+              color: 'primary.main',
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8,
+              },
             }}
           >
             DevClub

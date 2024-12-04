@@ -133,7 +133,7 @@ const Profile: React.FC = () => {
           </Paper>
         </Grid>
 
-        {/* Stats and Progress */}
+        {/* Stats and Info */}
         <Grid item xs={12} md={8}>
           <Grid container spacing={3}>
             {/* Stats Cards */}
@@ -187,50 +187,77 @@ const Profile: React.FC = () => {
               </Grid>
             </Grid>
 
-            {/* Progress Section */}
+            {/* Account Details */}
             <Grid item xs={12}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Level Progress
+                    Account Details
                   </Typography>
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Next level requirements:
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Username
+                      </Typography>
+                      <Typography variant="body1">
+                        {user.username}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Email
+                      </Typography>
+                      <Typography variant="body1">
+                        {user.email}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Member Since
+                      </Typography>
+                      <Typography variant="body1">
+                        {new Date().toLocaleDateString()} {/* Replace with actual join date */}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Account Status
+                      </Typography>
                       <Chip
-                        label="Complete 2 more projects"
-                        variant="outlined"
+                        label={user.is_approved ? "Approved" : "Pending"}
+                        color={user.is_approved ? "success" : "warning"}
                         size="small"
+                        sx={{ mt: 0.5 }}
                       />
-                      <Chip
-                        label="Earn 5 more points"
-                        variant="outlined"
-                        size="small"
-                      />
-                      <Chip
-                        label="Evaluate 3 more submissions"
-                        variant="outlined"
-                        size="small"
-                      />
-                    </Box>
-                  </Box>
+                    </Grid>
+                  </Grid>
                 </CardContent>
               </Card>
             </Grid>
 
-            {/* Recent Activity */}
+            {/* Achievements */}
             <Grid item xs={12}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Recent Activity
+                    Achievements
                   </Typography>
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No recent activity to display.
-                    </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 2 }}>
+                    <Chip
+                      icon={<StarIcon />}
+                      label="First Project"
+                      variant="outlined"
+                    />
+                    <Chip
+                      icon={<EmojiEventsIcon />}
+                      label="Level 5 Reached"
+                      variant="outlined"
+                    />
+                    <Chip
+                      icon={<AssignmentIcon />}
+                      label="10 Evaluations"
+                      variant="outlined"
+                    />
                   </Box>
                 </CardContent>
               </Card>
