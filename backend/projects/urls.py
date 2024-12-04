@@ -5,6 +5,8 @@ app_name = 'projects'
 
 urlpatterns = [
     path('', views.ProjectListView.as_view(), name='project-list'),
+    path('<int:pk>/', views.ProjectDetailView.as_view(), name='project-detail'),
+    path('my-submissions/', views.UserProjectSubmissionsView.as_view(), name='my-submissions'),
     path('submit/', views.ProjectSubmissionView.as_view(), name='submit'),
     path('pool/', views.EvaluationPoolView.as_view(), name='evaluation-pool'),
     path('evaluate/<int:pk>/', views.EvaluationView.as_view(), name='evaluate'),

@@ -1,70 +1,84 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
 import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
-  logout: () => void;
+  login: (credentials: { email: string; password: string }) => Promise<boolean>;
+  logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('token');
-      if (token) {
-        const response = await api.get<User>('/users/profile/');
-        setUser(response.data);
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
       }
+
+      const response = await api.get<User>('/users/profile/');
+      setUser(response.data);
     } catch (error) {
       localStorage.removeItem('token');
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const mockUser: User = {
-    id: 1,
-    username: "testuser",
-    email: "test@example.com",
-    points: 10,
-    level: 2,
-    is_approved: true,
-  };
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const login = async (credentials: { email: string; password: string }) => {
-    // const response = await api.post<{ token: string; user: User }>('/users/login/', credentials);
-    // localStorage.setItem('token', response.data.token);
-    // setUser(response.data.user);
-    console.log('Mock login');
-    setUser(mockUser);
-    localStorage.setItem('token', 'mockToken');
+    try {
+      // Get CSRF token first
+      await api.get('/users/login/');
+      
+      // Perform login
+      const response = await api.post<{ token: string; user: User }>('/users/login/', credentials);
+      
+      // First set the token
+      localStorage.setItem('token', response.data.token);
+      
+      // Then set the user state
+      setUser(response.data.user);
+      
+      // Return success
+      return true;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
   };
 
-  const logout = () => {
-    console.log('Mock logout');
-    localStorage.removeItem('token');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post('/users/logout/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      localStorage.removeItem('token');
+      setUser(null);
+    }
   };
 
   return (
-    // <AuthContext.Provider value={{ user, loading, login, logout }}>
-    <AuthContext.Provider value={{ user: mockUser, loading, login, logout }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
+      {children}
     </AuthContext.Provider>
   );
 };

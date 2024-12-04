@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Container,
   Paper,
@@ -9,6 +9,8 @@ import {
   Typography,
   Box,
   Divider,
+  Alert,
+  Snackbar,
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 
@@ -19,11 +21,23 @@ interface LoginFormData {
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, user } = useAuth();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   });
+  const [error, setError] = useState<string>('');
+  const [showError, setShowError] = useState(false);
+
+  const from = location.state?.from?.pathname || '/';
+
+  useEffect(() => {
+    if (user) {
+      console.log('User logged in, redirecting to:', from);
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -34,16 +48,24 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setShowError(false);
+    
     try {
       await login(formData);
-      navigate('/');
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login error:', error);
+      setError('Invalid email or password');
+      setShowError(true);
     }
   };
 
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/accounts/google/login/`;
+  };
+
+  const handleCloseError = () => {
+    setShowError(false);
   };
 
   return (
@@ -64,6 +86,7 @@ const Login: React.FC = () => {
             autoFocus
             value={formData.email}
             onChange={handleChange}
+            error={showError}
           />
           <TextField
             margin="normal"
@@ -76,6 +99,7 @@ const Login: React.FC = () => {
             autoComplete="current-password"
             value={formData.password}
             onChange={handleChange}
+            error={showError}
           />
           <Button
             type="submit"
@@ -96,6 +120,16 @@ const Login: React.FC = () => {
           </Button>
         </Box>
       </Paper>
+      <Snackbar 
+        open={showError} 
+        autoHideDuration={6000} 
+        onClose={handleCloseError}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

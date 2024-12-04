@@ -70,3 +70,11 @@ class EvaluationDetailView(generics.RetrieveUpdateAPIView):
             user = submission.submitted_by
             user.level += 1
             user.save()
+
+class UserProjectSubmissionsView(generics.ListAPIView):
+    """List all submissions by the current user"""
+    serializer_class = ProjectSubmissionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ProjectSubmission.objects.filter(submitted_by=self.request.user)

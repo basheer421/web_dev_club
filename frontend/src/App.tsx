@@ -2,7 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import AuthGuard from './components/AuthGuard';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -24,20 +25,6 @@ const theme = createTheme({
   },
 });
 
-interface PrivateRouteProps {
-  children: React.ReactNode;
-}
-
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  
-  return user ? <>{children}</> : <Navigate to="/login" />;
-};
-
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
@@ -47,30 +34,31 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={
-              <PrivateRoute>
+              <AuthGuard>
                 <Dashboard />
-              </PrivateRoute>
+              </AuthGuard>
             } />
             <Route path="/profile" element={
-              <PrivateRoute>
+              <AuthGuard>
                 <Profile />
-              </PrivateRoute>
+              </AuthGuard>
             } />
             <Route path="/settings" element={
-              <PrivateRoute>
+              <AuthGuard>
                 <Settings />
-              </PrivateRoute>
+              </AuthGuard>
             } />
             <Route path="/evaluation/:id" element={
-              <PrivateRoute>
+              <AuthGuard>
                 <EvaluationPage />
-              </PrivateRoute>
+              </AuthGuard>
             } />
             <Route path="/submit-project" element={
-              <PrivateRoute>
+              <AuthGuard>
                 <ProjectSubmission />
-              </PrivateRoute>
+              </AuthGuard>
             } />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
       </AuthProvider>

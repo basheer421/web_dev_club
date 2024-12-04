@@ -13,9 +13,16 @@ export interface Project {
   title: string;
   description: string;
   pdf_file: string;
-  github_repo: string;
+  points_required: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectSubmission {
+  id: number;
+  project: Project;
   submitted_by: User;
-  evaluator?: User;
+  github_repo: string;
   status: 'pending' | 'in_evaluation' | 'completed';
   created_at: string;
   updated_at: string;
@@ -23,9 +30,9 @@ export interface Project {
 
 export interface Evaluation {
   id: number;
-  project: Project;
+  submission: ProjectSubmission;
   evaluator: User;
   comments: string;
   is_approved: boolean;
   created_at: string;
-} 
+}

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,3 +22,20 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             approval_code=validated_data.get('approval_code')
         )
         return user 
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        try:
+            user = User.objects.get(email=data['email'])
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid credentials")
+
+        if user and user.check_password(data['password']):
+            if not user.is_active:
+                raise serializers.ValidationError("User account is disabled")
+            return user
+            
+        raise serializers.ValidationError("Invalid credentials")
