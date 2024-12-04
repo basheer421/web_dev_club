@@ -9,6 +9,7 @@ from .serializers import UserSerializer, UserRegistrationSerializer, UserLoginSe
 from django.middleware.csrf import get_token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.authtoken.models import Token
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
 
@@ -48,9 +49,17 @@ class UserLogoutView(APIView):
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
+    parser_classes = (MultiPartParser, FormParser)
     
     def get_object(self):
         return self.request.user
+
+    def perform_update(self, serializer):
+        if 'profile_picture' in self.request.FILES:
+            # Delete old profile picture if it exists
+            if self.request.user.profile_picture:
+                self.request.user.profile_picture.delete(save=False)
+        serializer.save()
 
 class UserSettingsView(generics.UpdateAPIView):
     serializer_class = UserSerializer
