@@ -96,6 +96,12 @@ const Navbar = () => {
             }}>
               Profile
             </MenuItem>
+            <MenuItem onClick={() => {
+              handleClose();
+              navigate('/my-submissions');
+            }}>
+              My Submissions
+            </MenuItem>
             <MenuItem onClick={handleLogout}>
               Logout
             </MenuItem>

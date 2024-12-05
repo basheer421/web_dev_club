@@ -20,12 +20,25 @@ class ProjectSubmissionView(generics.CreateAPIView):
     
     def perform_create(self, serializer):
         project = serializer.validated_data['project']
-        if self.request.user.points < project.points_required:
+        user = self.request.user
+        
+        # Check level requirement
+        if user.level < project.level_required:
+            raise ValidationError(f"You need to be level {project.level_required} to submit this project")
+        
+        # Check points requirement
+        if user.points < project.points_required:
             raise ValidationError(f"You need at least {project.points_required} points to submit this project")
         
-        self.request.user.points -= project.points_required
-        self.request.user.save()
-        serializer.save(submitted_by=self.request.user)
+        # Check if user already submitted this project
+        if ProjectSubmission.objects.filter(project=project, submitted_by=user).exists():
+            raise ValidationError("You have already submitted this project")
+        
+        # Deduct points
+        user.points -= project.points_required
+        user.save()
+        
+        serializer.save(submitted_by=user)
 
 class ProjectDetailView(generics.RetrieveAPIView):
     queryset = Project.objects.all()

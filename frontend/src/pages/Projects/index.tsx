@@ -1,24 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Grid,
-  Card,
-  CardContent,
+  Paper,
   Typography,
-  Button,
   Box,
   Tabs,
   Tab,
-  Paper,
-  Chip,
-  Link,
   CircularProgress,
 } from '@mui/material';
-import api from '../../services/api';
-import { Project, ProjectSubmission } from '../../types';
-import { useAuth } from '../../contexts/AuthContext';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import GitHubIcon from '@mui/icons-material/GitHub';
+import { Project, ProjectSubmission } from '@/types';
+import api from '@/services/api';
+import ProjectView from '@/components/ProjectView';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -26,22 +18,28 @@ interface TabPanelProps {
   value: number;
 }
 
-function TabPanel(props: TabPanelProps) {
+const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
   return (
-    <div role="tabpanel" hidden={value !== index} {...other}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
     </div>
   );
-}
+};
 
 const Projects: React.FC = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [tabValue, setTabValue] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [mySubmissions, setMySubmissions] = useState<ProjectSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -62,21 +60,8 @@ const Projects: React.FC = () => {
     }
   };
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-  };
-
-  const getStatusColor = (status: ProjectSubmission['status']) => {
-    switch (status) {
-      case 'pending':
-        return 'warning';
-      case 'in_evaluation':
-        return 'info';
-      case 'completed':
-        return 'success';
-      default:
-        return 'default';
-    }
   };
 
   if (loading) {
@@ -88,112 +73,62 @@ const Projects: React.FC = () => {
   }
 
   return (
-    <>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={handleTabChange}>
-            <Tab label="Available Projects" />
-            <Tab label="My Submissions" />
-          </Tabs>
-        </Box>
+    <Paper sx={{ width: '100%', mb: 2 }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={tabValue} onChange={handleTabChange}>
+          <Tab label="Available Projects" />
+          <Tab label="My Submissions" />
+        </Tabs>
+      </Box>
 
-        <TabPanel value={tabValue} index={0}>
-          <Grid container spacing={3}>
-            {projects.map((project) => (
-              <Grid item xs={12} md={6} lg={4} key={project.id}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {project.title}
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary" 
-                      component="div"
-                      sx={{ mb: 2 }}
-                    >
-                      {project.description}
-                    </Typography>
-                    <Box sx={{ mb: 2 }}>
-                      <Chip 
-                        label={`${project.points_required} Points Required`}
-                        color="primary"
-                        size="small"
-                      />
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<PictureAsPdfIcon />}
-                        component={Link}
-                        href={project.pdf_file}
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        View PDF
-                      </Button>
-                      <Button
-                        variant="contained"
-                        onClick={() => navigate(`/submit-project/${project.id}`)}
-                        disabled={user?.points ? user.points < project.points_required : true}
-                      >
-                        Submit Project
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </Card>
+      <TabPanel value={tabValue} index={0}>
+        <Grid container spacing={3}>
+          {projects.map((project) => {
+            const submission = mySubmissions.find(s => s.project.id === project.id);
+            return (
+              <Grid item xs={12} key={project.id}>
+                <Paper sx={{ p: 3 }}>
+                  <ProjectView 
+                    project={project}
+                    onSubmit={fetchData}
+                    submissionStatus={submission?.status}
+                  />
+                </Paper>
               </Grid>
-            ))}
-          </Grid>
-        </TabPanel>
+            );
+          })}
+          {projects.length === 0 && (
+            <Grid item xs={12}>
+              <Typography variant="body1" color="text.secondary" align="center">
+                No projects available.
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
+      </TabPanel>
 
-        <TabPanel value={tabValue} index={1}>
-          <Grid container spacing={3}>
-            {mySubmissions.map((submission) => (
-              <Grid item xs={12} md={6} lg={4} key={submission.id}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {submission.project.title}
-                    </Typography>
-                    <Box sx={{ mb: 2 }}>
-                      <Chip 
-                        label={submission.status} 
-                        color={getStatusColor(submission.status)}
-                        size="small"
-                      />
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 2 }}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<GitHubIcon />}
-                        component={Link}
-                        href={submission.github_repo}
-                        target="_blank"
-                        rel="noopener"
-                        size="small"
-                      >
-                        View Code
-                      </Button>
-                    </Box>
-                    <Typography variant="caption" color="text.secondary" component="div">
-                      Submitted: {new Date(submission.created_at).toLocaleDateString()}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-            {mySubmissions.length === 0 && (
-              <Grid item xs={12}>
-                <Typography variant="body1" color="text.secondary" align="center">
-                  You haven't submitted any projects yet.
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        </TabPanel>
-      </Paper>
-    </>
+      <TabPanel value={tabValue} index={1}>
+        <Grid container spacing={3}>
+          {mySubmissions.map((submission) => (
+            <Grid item xs={12} key={submission.id}>
+              <Paper sx={{ p: 3 }}>
+                <ProjectView 
+                  project={submission.project}
+                  submissionStatus={submission.status}
+                />
+              </Paper>
+            </Grid>
+          ))}
+          {mySubmissions.length === 0 && (
+            <Grid item xs={12}>
+              <Typography variant="body1" color="text.secondary" align="center">
+                You haven't submitted any projects yet.
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
+      </TabPanel>
+    </Paper>
   );
 };
 

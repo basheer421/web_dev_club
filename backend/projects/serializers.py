@@ -1,24 +1,23 @@
 from rest_framework import serializers
 from .models import Project, ProjectSubmission, Evaluation
+from users.serializers import UserSerializer
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['id', 'title', 'description', 'pdf_file', 'points_required', 'level_required', 'created_at', 'updated_at']
 
 class ProjectSubmissionSerializer(serializers.ModelSerializer):
-    project_title = serializers.CharField(source='project.title', read_only=True)
-    submitted_by_username = serializers.CharField(source='submitted_by.username', read_only=True)
-    points_required = serializers.IntegerField(source='project.points_required', read_only=True)
+    project = ProjectSerializer(read_only=True)
+    submitted_by = UserSerializer(read_only=True)
 
     class Meta:
         model = ProjectSubmission
-        fields = [
-            'id', 'project', 'project_title', 'submitted_by', 
-            'submitted_by_username', 'github_repo', 'status', 
-            'created_at', 'updated_at', 'points_required'
-        ]
+        fields = ['id', 'project', 'submitted_by', 'github_repo', 'status', 'created_at', 'updated_at']
         read_only_fields = ('submitted_by', 'status')
+
+    def create(self, validated_data):
+        return ProjectSubmission.objects.create(**validated_data)
 
 class EvaluationSerializer(serializers.ModelSerializer):
     evaluator_username = serializers.CharField(source='evaluator.username', read_only=True)

@@ -17,6 +17,7 @@ import EvaluationPage from './pages/EvaluationPage';
 import ProjectSubmission from './pages/ProjectSubmission';
 import Projects from './pages/Projects';
 import PendingApproval from './pages/PendingApproval';
+import MySubmissions from './pages/MySubmissions';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -57,6 +58,11 @@ const App: React.FC = () => {
             <Route path="/projects" element={
               <AuthGuard>
                 <Projects />
+              </AuthGuard>
+            } />
+            <Route path="/my-submissions" element={
+              <AuthGuard>
+                <MySubmissions />
               </AuthGuard>
             } />
 

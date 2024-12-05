@@ -20,6 +20,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import api from '../../services/api';
 import { Project, User } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import ProjectView from '@/components/ProjectView';
 
 interface ProjectInPool {
   id: number;
@@ -165,39 +166,10 @@ const Dashboard: React.FC = () => {
           Next Available Project
         </Typography>
         {nextProject ? (
-          <Box>
-            <Typography variant="h6" color="primary.main" gutterBottom>
-              {nextProject.title}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              {nextProject.description}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-              <Chip
-                label={`Level ${nextProject.level_required} Required`}
-                color="primary"
-                variant="outlined"
-              />
-              <Chip
-                label={`${nextProject.points_required} Points Required`}
-                color="secondary"
-                variant="outlined"
-              />
-              <Button
-                variant="contained"
-                onClick={() => navigate(`/submit-project/${nextProject.id}`)}
-                disabled={user?.points ? user.points < nextProject.points_required : false}
-                sx={{
-                  background: 'linear-gradient(45deg, #64FFDA, #7B89F4)',
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #5A6AD4, #A5B4FF)',
-                  },
-                }}
-              >
-                Start Project
-              </Button>
-            </Box>
-          </Box>
+          <ProjectView 
+            project={nextProject} 
+            onSubmit={fetchNextProject}
+          />
         ) : (
           <Typography variant="body1" color="text.secondary">
             No projects available at your current level. Keep evaluating to level up!
