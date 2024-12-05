@@ -23,24 +23,27 @@ class UserLoginView(APIView):
     
     def get(self, request):
         return Response({'csrfToken': get_token(request)})
-    
+
     def post(self, request):
-        serializer = UserLoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
+        try:
+            serializer = UserLoginSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.validated_data
+            
+            # Get or create token
+            token, _ = Token.objects.get_or_create(user=user)
         
-        # Get or create token
-        token, _ = Token.objects.get_or_create(user=user)
+            # Login user
+            backend = get_backends()[0]
+            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+            login(request, user)
         
-        # Login user
-        backend = get_backends()[0]
-        user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
-        login(request, user)
-        
-        return Response({
-            'token': token.key,
-            'user': UserSerializer(user).data
-        })
+            return Response({
+                'token': token.key,
+                'user': UserSerializer(user).data
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogoutView(APIView):
     def post(self, request):
