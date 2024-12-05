@@ -96,12 +96,6 @@ const Navbar = () => {
             }}>
               Profile
             </MenuItem>
-            <MenuItem onClick={() => {
-              handleClose();
-              navigate('/settings');
-            }}>
-              Settings
-            </MenuItem>
             <MenuItem onClick={handleLogout}>
               Logout
             </MenuItem>

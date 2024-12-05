@@ -13,7 +13,6 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
-import Settings from './pages/Settings';
 import EvaluationPage from './pages/EvaluationPage';
 import ProjectSubmission from './pages/ProjectSubmission';
 import Projects from './pages/Projects';
@@ -43,11 +42,6 @@ const App: React.FC = () => {
             <Route path="/profile" element={
               <AuthGuard>
                 <Profile />
-              </AuthGuard>
-            } />
-            <Route path="/settings" element={
-              <AuthGuard>
-                <Settings />
               </AuthGuard>
             } />
             <Route path="/evaluation/:id" element={
