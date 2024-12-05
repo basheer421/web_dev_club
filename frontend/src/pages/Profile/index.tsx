@@ -16,6 +16,8 @@ import {
   DialogActions,
   Button,
   CircularProgress,
+  TextField,
+  Tooltip,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -23,6 +25,9 @@ import StarIcon from '@mui/icons-material/Star';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import api from '../../services/api';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 const Profile: React.FC = () => {
   const { user, checkAuth } = useAuth();
@@ -30,6 +35,9 @@ const Profile: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState(user?.username || '');
+  const [usernameError, setUsernameError] = useState<string | null>(null);
 
   if (!user) return null;
 
@@ -62,6 +70,26 @@ const Profile: React.FC = () => {
       console.error('Error uploading avatar:', error);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleUsernameUpdate = async () => {
+    if (!newUsername.trim() || newUsername === user?.username) {
+      setIsEditingUsername(false);
+      setNewUsername(user?.username || '');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('username', newUsername);
+
+      await api.patch('/users/profile/', formData);
+      await checkAuth();
+      setIsEditingUsername(false);
+      setUsernameError(null);
+    } catch (error: any) {
+      setUsernameError(error.response?.data?.error || 'Failed to update username');
     }
   };
 
@@ -101,11 +129,52 @@ const Profile: React.FC = () => {
                 />
               </Badge>
             </Box>
-            <Typography variant="h5" gutterBottom>
-              {user.username}
-            </Typography>
+            {isEditingUsername ? (
+              <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <TextField
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  error={Boolean(usernameError)}
+                  helperText={usernameError}
+                  size="small"
+                  sx={{ width: '200px' }}
+                />
+                <IconButton 
+                  size="small" 
+                  color="primary"
+                  onClick={handleUsernameUpdate}
+                >
+                  <CheckIcon />
+                </IconButton>
+                <IconButton 
+                  size="small" 
+                  color="error"
+                  onClick={() => {
+                    setIsEditingUsername(false);
+                    setNewUsername(user?.username || '');
+                    setUsernameError(null);
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+            ) : (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <Typography variant="h5" gutterBottom>
+                  {user?.username}
+                </Typography>
+                <Tooltip title="Edit username">
+                  <IconButton 
+                    size="small"
+                    onClick={() => setIsEditingUsername(true)}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              {user.email}
+              {user?.email}
             </Typography>
             <Box sx={{ mt: 2 }}>
               <Chip

@@ -49,19 +49,29 @@ class UserLogoutView(APIView):
         logout(request)
         return Response(status=status.HTTP_200_OK)
 
-class UserProfileView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
-    parser_classes = (MultiPartParser, FormParser)
+class UserProfileView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     
-    def get_object(self):
-        return self.request.user
-
-    def perform_update(self, serializer):
-        if 'profile_picture' in self.request.FILES:
-            # Delete old profile picture if it exists
-            if self.request.user.profile_picture:
-                self.request.user.profile_picture.delete(save=False)
-        serializer.save()
+    def patch(self, request):
+        user = request.user
+        
+        # Handle profile picture upload
+        if 'profile_picture' in request.FILES:
+            user.profile_picture = request.FILES['profile_picture']
+        
+        # Handle username update
+        if 'username' in request.data:
+            new_username = request.data['username']
+            if User.objects.filter(username=new_username).exclude(id=user.id).exists():
+                return Response(
+                    {'error': 'Username already taken'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            user.username = new_username
+        
+        user.save()
+        return Response(UserSerializer(user).data)
 
 class UserSettingsView(generics.UpdateAPIView):
     serializer_class = UserSerializer
