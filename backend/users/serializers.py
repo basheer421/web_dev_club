@@ -9,19 +9,41 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('points', 'level')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    password_confirm = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'approval_code')
+        fields = ('email', 'password', 'password_confirm')
         extra_kwargs = {'password': {'write_only': True}}
 
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password_confirm']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+        return attrs
+
     def create(self, validated_data):
+        # Remove password_confirm from validated data
+        validated_data.pop('password_confirm', None)
+        
+        # Generate username from email
+        email = validated_data['email']
+        username = email.split('@')[0]
+        
+        # If username already exists, append numbers until we find a unique one
+        base_username = username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+            
+        # Create user with generated username
         user = User.objects.create_user(
-            username=validated_data['username'],
+            username=username,
             email=validated_data['email'],
             password=validated_data['password'],
-            approval_code=validated_data.get('approval_code')
+            is_approved=False
         )
-        return user 
+        return user
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

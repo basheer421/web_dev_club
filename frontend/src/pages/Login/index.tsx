@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   Container,
@@ -109,6 +109,13 @@ const Login: React.FC = () => {
           >
             Sign In
           </Button>
+          <Box sx={{ textAlign: 'center', mt: 2 }}>
+            <Link to="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Typography variant="body2" color="primary">
+                Don't have an account? Sign up
+              </Typography>
+            </Link>
+          </Box>
           <Divider sx={{ my: 2 }}>or</Divider>
           <Button
             fullWidth

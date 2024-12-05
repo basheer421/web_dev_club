@@ -91,3 +91,18 @@ class UserApprovalView(APIView):
                 {'error': 'Invalid approval code'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+class RegisterView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                'user': UserSerializer(user).data,
+                'token': token.key,
+                'message': 'Registration successful. Please wait for admin approval.'
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,16 +1,25 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import { User } from '../types';
+import axios from 'axios';
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
+  isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<boolean>;
-  logout: () => Promise<void>;
+  logout: () => void;
+  setUserAndToken: (userData: any, token: string) => void;
   checkAuth: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isAuthenticated: false,
+  login: async () => false,
+  logout: () => {},
+  setUserAndToken: () => {},
+  checkAuth: async () => {},
+});
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -76,8 +85,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const setUserAndToken = useCallback((userData: any, token: string) => {
+    setUser(userData);
+    localStorage.setItem('token', token);
+    axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: !!user,
+      login,
+      logout,
+      setUserAndToken,
+      checkAuth,
+    }}>
       {children}
     </AuthContext.Provider>
   );

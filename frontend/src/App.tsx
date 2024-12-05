@@ -15,6 +15,7 @@ import EvaluationPage from './pages/EvaluationPage';
 import ProjectSubmission from './pages/ProjectSubmission';
 import Projects from './pages/Projects';
 import PendingApproval from './pages/PendingApproval';
+import Register from './pages/Register';
 
 const theme = createTheme({
   palette: {
@@ -69,6 +70,7 @@ const App: React.FC = () => {
               </AuthGuard>
             } />
             <Route path="/approval" element={<PendingApproval />} />
+            <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AnimatePresence>
