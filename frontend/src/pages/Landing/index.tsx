@@ -1,7 +1,8 @@
-import { Box, Container, Typography, Button, alpha, AppBar, Toolbar } from '@mui/material';
+import { Box, Container, Typography, Button, AppBar, Toolbar } from '@mui/material';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import StarField from '@/components/StarField';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -20,25 +21,30 @@ const Landing: React.FC = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Stars background effect */}
+      <StarField />
+
+      {/* Animated orbs */}
       <Box
+        component={motion.div}
+        animate={{
+          scale: [1, 1.2, 1],
+          rotate: [0, 90, 0],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear"
+        }}
         sx={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 0,
-          opacity: 0.5,
-          background: 'radial-gradient(circle at center, transparent 0%, #0A192F 100%)',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            background: 'url("/stars.png")',
-            animation: 'twinkle 8s infinite linear',
-          },
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at center, rgba(100, 255, 218, 0.1), transparent)',
+          filter: 'blur(60px)',
+          top: '-20%',
+          right: '-10%',
+          zIndex: 1,
         }}
       />
 
@@ -84,31 +90,6 @@ const Landing: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Animated orbs */}
-      <Box
-        component={motion.div}
-        animate={{
-          scale: [1, 1.2, 1],
-          rotate: [0, 90, 0],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-        sx={{
-          position: 'absolute',
-          width: '600px',
-          height: '600px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at center, rgba(100, 255, 218, 0.1), transparent)',
-          filter: 'blur(60px)',
-          top: '-20%',
-          right: '-10%',
-          zIndex: 0,
-        }}
-      />
-
       {/* Content */}
       <Container
         maxWidth="lg"
@@ -118,7 +99,7 @@ const Landing: React.FC = () => {
           flexDirection: 'column',
           justifyContent: 'center',
           position: 'relative',
-          zIndex: 1,
+          zIndex: 2,
         }}
       >
         <Box

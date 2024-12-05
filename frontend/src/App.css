@@ -50,8 +50,25 @@
   }
 }
 
+@keyframes space-float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-25%, -25%) rotate(0.5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
 body {
   margin: 0;
   padding: 0;
+  background-color: #0A192F;
+  overflow-x: hidden;
+}
+
+html {
   background-color: #0A192F;
 }
