@@ -95,11 +95,24 @@ const Profile: React.FC = () => {
 
   return (
     <>
-      <Grid container spacing={3}>
+      <Grid container spacing={4} sx={{ height: '100%' }}>
         {/* Profile Overview */}
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, textAlign: 'center' }}>
-            <Box sx={{ position: 'relative', display: 'inline-block' }}>
+          <Paper 
+            sx={{ 
+              p: 4, 
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 3,
+            }}
+          >
+            <Box sx={{ 
+              position: 'relative', 
+              display: 'inline-block',
+              mb: 2,
+            }}>
               <Badge
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -124,13 +137,19 @@ const Profile: React.FC = () => {
                 }
               >
                 <Avatar
-                  src={user.profile_picture || undefined}
-                  sx={{ width: 120, height: 120, mb: 2 }}
+                  src={user?.profile_picture || undefined}
+                  sx={{ 
+                    width: 180, 
+                    height: 180,
+                    border: '4px solid',
+                    borderColor: 'rgba(100, 255, 218, 0.2)',
+                  }}
                 />
               </Badge>
             </Box>
+
             {isEditingUsername ? (
-              <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <TextField
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
@@ -139,11 +158,7 @@ const Profile: React.FC = () => {
                   size="small"
                   sx={{ width: '200px' }}
                 />
-                <IconButton 
-                  size="small" 
-                  color="primary"
-                  onClick={handleUsernameUpdate}
-                >
+                <IconButton size="small" color="primary" onClick={handleUsernameUpdate}>
                   <CheckIcon />
                 </IconButton>
                 <IconButton 
@@ -159,36 +174,44 @@ const Profile: React.FC = () => {
                 </IconButton>
               </Box>
             ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <Typography variant="h5" gutterBottom>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="h4">
                   {user?.username}
                 </Typography>
                 <Tooltip title="Edit username">
-                  <IconButton 
-                    size="small"
-                    onClick={() => setIsEditingUsername(true)}
-                  >
+                  <IconButton size="small" onClick={() => setIsEditingUsername(true)}>
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Box>
             )}
-            <Typography variant="body2" color="text.secondary" gutterBottom>
+
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
               {user?.email}
             </Typography>
-            <Box sx={{ mt: 2 }}>
+
+            <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column', width: '100%' }}>
               <Chip
                 icon={<StarIcon />}
-                label={`Level ${user.level}`}
+                label={`Level ${user?.level}`}
                 color="primary"
-                variant="outlined"
-                sx={{ mr: 1 }}
+                sx={{ 
+                  width: '100%', 
+                  py: 3,
+                  background: 'rgba(100, 255, 218, 0.1)',
+                  '& .MuiChip-icon': { fontSize: '1.5rem' }
+                }}
               />
               <Chip
                 icon={<EmojiEventsIcon />}
-                label={`${user.points} Points`}
+                label={`${user?.points} Points`}
                 color="secondary"
-                variant="outlined"
+                sx={{ 
+                  width: '100%', 
+                  py: 3,
+                  background: 'rgba(123, 137, 244, 0.1)',
+                  '& .MuiChip-icon': { fontSize: '1.5rem' }
+                }}
               />
             </Box>
           </Paper>
@@ -196,34 +219,42 @@ const Profile: React.FC = () => {
 
         {/* Stats */}
         <Grid item xs={12} md={8}>
-          <Grid container spacing={2}>
+          <Grid container spacing={3} sx={{ height: '100%' }}>
             <Grid item xs={12} sm={6}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <EmojiEventsIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
-                    <Box>
-                      <Typography variant="h6">{user.level}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Current Level
-                      </Typography>
-                    </Box>
-                  </Box>
+              <Card sx={{ height: '100%', background: 'rgba(100, 255, 218, 0.05)' }}>
+                <CardContent sx={{ 
+                  p: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
+                }}>
+                  <EmojiEventsIcon sx={{ fontSize: 60, color: 'primary.main' }} />
+                  <Typography variant="h3" sx={{ color: 'primary.main' }}>
+                    {user?.level}
+                  </Typography>
+                  <Typography variant="h6" color="text.secondary">
+                    Current Level
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <AssignmentIcon sx={{ fontSize: 40, mr: 2, color: 'secondary.main' }} />
-                    <Box>
-                      <Typography variant="h6">{user.points}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Total Points
-                      </Typography>
-                    </Box>
-                  </Box>
+              <Card sx={{ height: '100%', background: 'rgba(123, 137, 244, 0.05)' }}>
+                <CardContent sx={{ 
+                  p: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
+                }}>
+                  <AssignmentIcon sx={{ fontSize: 60, color: 'secondary.main' }} />
+                  <Typography variant="h3" sx={{ color: 'secondary.main' }}>
+                    {user?.points}
+                  </Typography>
+                  <Typography variant="h6" color="text.secondary">
+                    Total Points
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
