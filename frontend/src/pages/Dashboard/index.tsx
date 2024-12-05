@@ -141,8 +141,29 @@ const Dashboard: React.FC = () => {
         </Grid>
       </Grid>
 
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+        <Button
+          variant="contained"
+          size="large"
+          onClick={() => navigate('/projects')}
+          startIcon={<AssignmentIcon />}
+          sx={{
+            py: 2,
+            px: 4,
+            fontSize: '1.1rem',
+            background: 'linear-gradient(45deg, #64FFDA, #7B89F4)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #5A6AD4, #A5B4FF)',
+            },
+            boxShadow: '0 4px 14px 0 rgba(100, 255, 218, 0.3)',
+          }}
+        >
+          View All Projects
+        </Button>
+      </Box>
+
       {/* Evaluation Pool Section */}
-      <Paper elevation={2} sx={{ p: 3 }}>
+      <Paper elevation={2} sx={{ p: 3, mt: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h5" component="h2">
             Evaluation Pool

@@ -38,6 +38,7 @@ const Navbar = () => {
         <Typography
           variant="h6"
           component="div"
+          onClick={() => navigate('/dashboard')}
           sx={{
             flexGrow: 1,
             background: 'linear-gradient(45deg, #64FFDA, #7B89F4)',
@@ -45,17 +46,15 @@ const Navbar = () => {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             fontWeight: 700,
+            cursor: 'pointer',
+            '&:hover': {
+              opacity: 0.8,
+            },
           }}
         >
           DevClub
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            color="inherit"
-            onClick={() => navigate('/dashboard')}
-          >
-            Dashboard
-          </Button>
           <Button
             color="inherit"
             onClick={() => navigate('/projects')}
