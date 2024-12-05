@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
+import BackToHome from '@/components/BackToHome';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ const Register = () => {
 
   return (
     <Container component="main" maxWidth="xs">
+      <BackToHome />
       <Box
         sx={{
           marginTop: 8,

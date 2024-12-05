@@ -11,18 +11,20 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
+import BackToHome from '@/components/BackToHome';
 
 const PendingApproval = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout();
+    logout();
     navigate('/login');
   };
 
   return (
     <Container component="main" maxWidth="sm">
+      <BackToHome />
       <Box
         sx={{
           marginTop: 8,

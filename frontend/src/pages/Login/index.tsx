@@ -13,6 +13,7 @@ import {
   Snackbar,
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
+import BackToHome from '@/components/BackToHome';
 
 interface LoginFormData {
   email: string;
@@ -68,6 +69,7 @@ const Login: React.FC = () => {
 
   return (
     <Container component="main" maxWidth="xs">
+      <BackToHome />
       <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
         <Typography component="h1" variant="h5" align="center">
           Sign in to DevClub
