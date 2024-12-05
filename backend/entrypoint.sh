@@ -32,6 +32,15 @@ python manage.py migrate --run-syncdb
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
+
+# Create superuser
+echo "Creating superuser if not exists..."
+python manage.py shell <<EOF
+from users.models import User
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser('admin', 'admin@example.com', 'password')
+EOF
+
 # Start server
 echo "Starting server..."
 python manage.py runserver 0.0.0.0:8000 

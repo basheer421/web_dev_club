@@ -3,7 +3,7 @@ from django.db import models
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    points = models.IntegerField(default=0)
+    points = models.IntegerField(default=3)
     level = models.IntegerField(default=1)
     is_approved = models.BooleanField(default=False)
     approval_code = models.CharField(max_length=20, blank=True, null=True)
