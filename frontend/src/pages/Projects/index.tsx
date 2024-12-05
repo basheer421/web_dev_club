@@ -14,7 +14,6 @@ import {
   Link,
   CircularProgress,
 } from '@mui/material';
-import Layout from '../../components/Layout';
 import api from '../../services/api';
 import { Project, ProjectSubmission } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -82,16 +81,14 @@ const Projects: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-          <CircularProgress />
-        </Box>
-      </Layout>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+        <CircularProgress />
+      </Box>
     );
   }
 
   return (
-    <Layout>
+    <>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tabValue} onChange={handleTabChange}>
@@ -196,7 +193,7 @@ const Projects: React.FC = () => {
           </Grid>
         </TabPanel>
       </Paper>
-    </Layout>
+    </>
   );
 };
 

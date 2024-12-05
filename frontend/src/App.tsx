@@ -28,9 +28,13 @@ const App: React.FC = () => {
       <AuthProvider>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
+            {/* Public routes */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/approval" element={<PendingApproval />} />
+
+            {/* Protected routes */}
             <Route path="/dashboard" element={
               <AuthGuard>
                 <Dashboard />
@@ -61,7 +65,9 @@ const App: React.FC = () => {
                 <Projects />
               </AuthGuard>
             } />
-            <Route path="/approval" element={<PendingApproval />} />
+
+            {/* Fallback route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AnimatePresence>
       </AuthProvider>

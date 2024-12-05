@@ -17,7 +17,6 @@ import {
 } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import Layout from '../../components/Layout';
 import api from '../../services/api';
 import { Project } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -72,47 +71,70 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <Layout>
+    <>
       {/* User Stats Section */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%', bgcolor: theme.palette.primary.main, color: 'white' }}>
+          <Card sx={{ 
+            height: '100%', 
+            background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(123, 137, 244, 0.15))',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(100, 255, 218, 0.2)',
+          }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
                 Welcome back, {user?.username}!
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <EmojiEventsIcon sx={{ fontSize: 40, mr: 2 }} />
+                <EmojiEventsIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
                 <Box>
-                  <Typography variant="body2">Current Level</Typography>
-                  <Typography variant="h4">{user?.level}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Current Level
+                  </Typography>
+                  <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                    {user?.level}
+                  </Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%', bgcolor: theme.palette.secondary.main, color: 'white' }}>
+          <Card sx={{ 
+            height: '100%',
+            background: 'linear-gradient(135deg, rgba(123, 137, 244, 0.15), rgba(100, 255, 218, 0.15))',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(123, 137, 244, 0.2)',
+          }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
                 Available Points
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <AssignmentIcon sx={{ fontSize: 40, mr: 2 }} />
-                <Typography variant="h4">{user?.points}</Typography>
+                <AssignmentIcon sx={{ fontSize: 40, mr: 2, color: 'secondary.main' }} />
+                <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                  {user?.points}
+                </Typography>
               </Box>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%', bgcolor: '#2e7d32', color: 'white' }}>
+          <Card sx={{ 
+            height: '100%',
+            background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(100, 255, 218, 0.05))',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(100, 255, 218, 0.2)',
+          }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
                 Projects to Evaluate
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <AssignmentIcon sx={{ fontSize: 40, mr: 2 }} />
-                <Typography variant="h4">{projects.length}</Typography>
+                <AssignmentIcon sx={{ fontSize: 40, mr: 2, color: 'success.light' }} />
+                <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                  {projects.length}
+                </Typography>
               </Box>
             </CardContent>
           </Card>
@@ -210,7 +232,7 @@ const Dashboard: React.FC = () => {
           )}
         </List>
       </Paper>
-    </Layout>
+    </>
   );
 };
 

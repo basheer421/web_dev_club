@@ -15,7 +15,6 @@ import {
   CardContent,
   Divider,
 } from '@mui/material';
-import Layout from '../../components/Layout';
 import api from '../../services/api';
 import { ProjectSubmission } from '../../types';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -81,24 +80,24 @@ const EvaluationPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout>
+      <>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
           <CircularProgress />
         </Box>
-      </Layout>
+      </>
     );
   }
 
   if (!submission) {
     return (
-      <Layout>
+      <>
         <Alert severity="error">Submission not found</Alert>
-      </Layout>
+      </>
     );
   }
 
   return (
-    <Layout>
+    <>
       {error ? (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
@@ -195,7 +194,7 @@ const EvaluationPage: React.FC = () => {
           </Grid>
         </Grid>
       )}
-    </Layout>
+    </>
   );
 };
 
