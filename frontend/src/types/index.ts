@@ -14,6 +14,7 @@ export interface Project {
   description: string;
   pdf_file: string;
   points_required: number;
+  level_required: number;
   created_at: string;
   updated_at: string;
 }

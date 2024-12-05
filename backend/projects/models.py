@@ -4,8 +4,9 @@ from users.models import User
 class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    pdf_file = models.FileField(upload_to='project_pdfs/')
+    pdf_file = models.FileField(upload_to='projects/pdfs/')
     points_required = models.IntegerField(default=1)
+    level_required = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

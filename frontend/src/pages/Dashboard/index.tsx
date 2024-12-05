@@ -18,7 +18,7 @@ import {
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import api from '../../services/api';
-import { Project } from '../../types';
+import { Project, User } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface ProjectInPool {
@@ -26,21 +26,20 @@ interface ProjectInPool {
   project: Project;
   status: string;
   created_at: string;
-  submitted_by: {
-    id: number;
-    username: string;
-  };
+  submitted_by: User;
 }
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const theme = useTheme();
+  useTheme();
   const { user } = useAuth();
   const [projects, setProjects] = useState<ProjectInPool[]>([]);
   const [loading, setLoading] = useState(true);
+  const [nextProject, setNextProject] = useState<Project | null>(null);
 
   useEffect(() => {
     fetchProjects();
+    fetchNextProject();
   }, []);
 
   const fetchProjects = async () => {
@@ -53,6 +52,17 @@ const Dashboard: React.FC = () => {
       setProjects(response.data);
     } catch (error) {
       console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchNextProject = async () => {
+    try {
+      const response = await api.get<Project>('/projects/next/');
+      setNextProject(response.data);
+    } catch (error) {
+      console.error('Error fetching next project:', error);
     } finally {
       setLoading(false);
     }
@@ -141,26 +151,59 @@ const Dashboard: React.FC = () => {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-        <Button
-          variant="contained"
-          size="large"
-          onClick={() => navigate('/projects')}
-          startIcon={<AssignmentIcon />}
-          sx={{
-            py: 2,
-            px: 4,
-            fontSize: '1.1rem',
-            background: 'linear-gradient(45deg, #64FFDA, #7B89F4)',
-            '&:hover': {
-              background: 'linear-gradient(45deg, #5A6AD4, #A5B4FF)',
-            },
-            boxShadow: '0 4px 14px 0 rgba(100, 255, 218, 0.3)',
-          }}
-        >
-          View All Projects
-        </Button>
-      </Box>
+      {/* Next Project Box */}
+      <Paper 
+        elevation={2} 
+        sx={{ 
+          p: 4, 
+          mt: 4,
+          background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.1), rgba(123, 137, 244, 0.1))',
+          border: '1px solid rgba(100, 255, 218, 0.2)',
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          Next Available Project
+        </Typography>
+        {nextProject ? (
+          <Box>
+            <Typography variant="h6" color="primary.main" gutterBottom>
+              {nextProject.title}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {nextProject.description}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Chip
+                label={`Level ${nextProject.level_required} Required`}
+                color="primary"
+                variant="outlined"
+              />
+              <Chip
+                label={`${nextProject.points_required} Points Required`}
+                color="secondary"
+                variant="outlined"
+              />
+              <Button
+                variant="contained"
+                onClick={() => navigate(`/submit-project/${nextProject.id}`)}
+                disabled={user?.points ? user.points < nextProject.points_required : false}
+                sx={{
+                  background: 'linear-gradient(45deg, #64FFDA, #7B89F4)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #5A6AD4, #A5B4FF)',
+                  },
+                }}
+              >
+                Start Project
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Typography variant="body1" color="text.secondary">
+            No projects available at your current level. Keep evaluating to level up!
+          </Typography>
+        )}
+      </Paper>
 
       {/* Evaluation Pool Section */}
       <Paper elevation={2} sx={{ p: 3, mt: 4 }}>

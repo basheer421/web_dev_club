@@ -87,3 +87,18 @@ class UserProjectSubmissionsView(generics.ListAPIView):
 
     def get_queryset(self):
         return ProjectSubmission.objects.filter(submitted_by=self.request.user)
+
+class NextProjectView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        next_project = Project.objects.filter(
+            level_required__lte=user.level
+        ).exclude(
+            submissions__submitted_by=user
+        ).order_by('level_required').first()
+
+        if next_project:
+            return Response(ProjectSerializer(next_project).data)
+        return Response({'message': 'No projects available'}, status=status.HTTP_404_NOT_FOUND)

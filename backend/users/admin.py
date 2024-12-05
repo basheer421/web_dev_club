@@ -13,9 +13,10 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('email', 'first_name', 'last_name', 'profile_picture')}),
         ('Progress', {'fields': ('points', 'level')}),
-        ('Status', {'fields': ('is_approved', 'approval_code')}),
+        # ('Status', {'fields': ('is_approved')}),
+        ('Status', {'fields': ('is_approved', 'is_active')}),
         ('Permissions', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': ('is_staff', 'is_superuser', 'groups', 'user_permissions'),
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
