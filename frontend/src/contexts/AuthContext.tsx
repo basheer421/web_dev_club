@@ -27,14 +27,12 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         setUser(null);
-        setLoading(false);
         return;
       }
 
@@ -43,8 +41,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       localStorage.removeItem('token');
       setUser(null);
-    } finally {
-      setLoading(false);
     }
   };
 
