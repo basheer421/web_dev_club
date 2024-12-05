@@ -30,11 +30,10 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [showError, setShowError] = useState(false);
 
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/dashboard';
 
   useEffect(() => {
     if (user) {
-      console.log('User logged in, redirecting to:', from);
       navigate(from, { replace: true });
     }
   }, [user, navigate, from]);
@@ -54,7 +53,6 @@ const Login: React.FC = () => {
     try {
       await login(formData);
     } catch (error) {
-      console.error('Login error:', error);
       setError('Invalid email or password');
       setShowError(true);
     }
