@@ -18,6 +18,10 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  if (!user.is_approved) {
+    return <Navigate to="/approval" state={{ from: location }} replace />;
+  }
+
   return <>{children}</>;
 };
 

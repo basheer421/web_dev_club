@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'points', 'level', 'profile_picture')
+        fields = ('id', 'username', 'email', 'points', 'level', 'profile_picture', 'is_approved')
         read_only_fields = ('points', 'level')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

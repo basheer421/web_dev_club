@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -9,9 +9,18 @@ import {
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 import PendingIcon from '@mui/icons-material/AccessTime';
+import { Navigate } from 'react-router-dom';
 
 const PendingApproval: React.FC = () => {
-  const { user } = useAuth();
+  const { user, checkAuth } = useAuth();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  if (!user || user.is_approved) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Container maxWidth="sm">
