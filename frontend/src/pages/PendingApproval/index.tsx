@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Paper,
@@ -6,41 +6,55 @@ import {
   Container,
   Alert,
   AlertTitle,
+  Button,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
-import PendingIcon from '@mui/icons-material/AccessTime';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-const PendingApproval: React.FC = () => {
-  const { user, checkAuth } = useAuth();
+const PendingApproval = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  if (!user || user.is_approved) {
-    return <Navigate to="/" replace />;
-  }
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 8 }}>
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <PendingIcon sx={{ fontSize: 60, color: 'warning.main', mb: 2 }} />
-          <Typography variant="h5" gutterBottom>
-            Account Pending Approval
+    <Container component="main" maxWidth="sm">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
+          <Typography component="h1" variant="h4" align="center" gutterBottom>
+            Account Not Approved
           </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Hi {user?.username}, your account is currently pending approval from an administrator.
-          </Typography>
-          <Alert severity="info" sx={{ mt: 2, textAlign: 'left' }}>
-            <AlertTitle>What happens next?</AlertTitle>
-            <Typography variant="body2">
-              • An administrator will review your account<br />
-              • You'll receive an email when your account is approved<br />
+          <Alert severity="info" sx={{ mt: 3 }}>
+            <AlertTitle>Your account is pending approval</AlertTitle>
+            <Typography variant="body2" component="div">
+              • Please wait while an administrator reviews your account
+              <br />
+              • You will receive an email once your account is approved
+              <br />
               • Once approved, you'll have full access to the platform
             </Typography>
           </Alert>
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleLogout}
+              startIcon={<LogoutIcon />}
+            >
+              Logout
+            </Button>
+          </Box>
         </Paper>
       </Box>
     </Container>

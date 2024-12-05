@@ -56,7 +56,6 @@ const Profile: React.FC = () => {
         },
       });
 
-      // Refresh user data to get new avatar
       await checkAuth();
       setOpenDialog(false);
     } catch (error) {
@@ -68,7 +67,130 @@ const Profile: React.FC = () => {
 
   return (
     <>
-      {/* Profile content */}
+      <Grid container spacing={3}>
+        {/* Profile Overview */}
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, textAlign: 'center' }}>
+            <Box sx={{ position: 'relative', display: 'inline-block' }}>
+              <Badge
+                overlap="circular"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                badgeContent={
+                  <IconButton
+                    size="small"
+                    sx={{
+                      bgcolor: 'primary.main',
+                      '&:hover': { bgcolor: 'primary.dark' },
+                    }}
+                    component="label"
+                  >
+                    <input
+                      hidden
+                      accept="image/*"
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                    />
+                    <CameraAltIcon sx={{ fontSize: 20, color: 'background.default' }} />
+                  </IconButton>
+                }
+              >
+                <Avatar
+                  src={user.profile_picture || undefined}
+                  sx={{ width: 120, height: 120, mb: 2 }}
+                />
+              </Badge>
+            </Box>
+            <Typography variant="h5" gutterBottom>
+              {user.username}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {user.email}
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <Chip
+                icon={<StarIcon />}
+                label={`Level ${user.level}`}
+                color="primary"
+                variant="outlined"
+                sx={{ mr: 1 }}
+              />
+              <Chip
+                icon={<EmojiEventsIcon />}
+                label={`${user.points} Points`}
+                color="secondary"
+                variant="outlined"
+              />
+            </Box>
+          </Paper>
+        </Grid>
+
+        {/* Stats */}
+        <Grid item xs={12} md={8}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <EmojiEventsIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
+                    <Box>
+                      <Typography variant="h6">{user.level}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Current Level
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <AssignmentIcon sx={{ fontSize: 40, mr: 2, color: 'secondary.main' }} />
+                    <Box>
+                      <Typography variant="h6">{user.points}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Total Points
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+
+      {/* Image Upload Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Update Profile Picture</DialogTitle>
+        <DialogContent>
+          {previewUrl && (
+            <Box sx={{ mt: 2 }}>
+              <img
+                src={previewUrl}
+                alt="Preview"
+                style={{ maxWidth: '100%', maxHeight: 300, objectFit: 'contain' }}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} disabled={uploading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUpload}
+            variant="contained"
+            color="primary"
+            disabled={uploading}
+            startIcon={uploading ? <CircularProgress size={20} /> : null}
+          >
+            {uploading ? 'Uploading...' : 'Upload'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
