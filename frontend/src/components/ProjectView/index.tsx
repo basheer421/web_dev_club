@@ -19,12 +19,14 @@ interface ProjectViewProps {
   project: Project;
   onSubmit?: () => void;
   submissionStatus?: string;
+  onSubmitSuccess?: () => Promise<void>;
 }
 
 const ProjectView: React.FC<ProjectViewProps> = ({
   project,
   onSubmit,
   submissionStatus,
+  onSubmitSuccess,
 }) => {
   const { user } = useAuth();
   const [openSubmitDialog, setOpenSubmitDialog] = useState(false);
@@ -64,6 +66,10 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       setOpenSubmitDialog(false);
       setGithubRepo("");
       if (onSubmit) onSubmit();
+      
+      if (onSubmitSuccess) {
+        await onSubmitSuccess();
+      }
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || 
                           error.response?.data?.message ||

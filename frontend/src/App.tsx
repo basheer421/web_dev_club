@@ -1,23 +1,22 @@
-import React from 'react';
-import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { AuthProvider } from './contexts/AuthContext';
-import AuthGuard from './components/AuthGuard';
-import { AnimatePresence } from 'framer-motion';
-import { theme } from './theme';
+import React from "react";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { AuthProvider } from "./contexts/AuthContext";
+import AuthGuard from "./components/AuthGuard";
+import { AnimatePresence } from "framer-motion";
+import { theme } from "./theme";
 
 // Pages
-import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
-import EvaluationPage from './pages/EvaluationPage';
-import ProjectSubmission from './pages/ProjectSubmission';
-import Projects from './pages/Projects';
-import PendingApproval from './pages/PendingApproval';
-import MySubmissions from './pages/MySubmissions';
+import Landing from "./pages/Landing";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import EvaluationPage from "./pages/EvaluationPage";
+import Projects from "./pages/Projects";
+import PendingApproval from "./pages/PendingApproval";
+import MySubmissions from "./pages/MySubmissions";
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -35,36 +34,46 @@ const App: React.FC = () => {
             <Route path="/approval" element={<PendingApproval />} />
 
             {/* Protected routes */}
-            <Route path="/dashboard" element={
-              <AuthGuard>
-                <Dashboard />
-              </AuthGuard>
-            } />
-            <Route path="/profile" element={
-              <AuthGuard>
-                <Profile />
-              </AuthGuard>
-            } />
-            <Route path="/evaluation/:id" element={
-              <AuthGuard>
-                <EvaluationPage />
-              </AuthGuard>
-            } />
-            <Route path="/submit-project" element={
-              <AuthGuard>
-                <ProjectSubmission />
-              </AuthGuard>
-            } />
-            <Route path="/projects" element={
-              <AuthGuard>
-                <Projects />
-              </AuthGuard>
-            } />
-            <Route path="/my-submissions" element={
-              <AuthGuard>
-                <MySubmissions />
-              </AuthGuard>
-            } />
+            <Route
+              path="/dashboard"
+              element={
+                <AuthGuard>
+                  <Dashboard />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <AuthGuard>
+                  <Profile />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/evaluation/:id"
+              element={
+                <AuthGuard>
+                  <EvaluationPage />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <AuthGuard>
+                  <Projects />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/my-submissions"
+              element={
+                <AuthGuard>
+                  <MySubmissions />
+                </AuthGuard>
+              }
+            />
 
             {/* Fallback route */}
             <Route path="*" element={<Navigate to="/" replace />} />
