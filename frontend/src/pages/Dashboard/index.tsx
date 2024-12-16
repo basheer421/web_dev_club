@@ -33,15 +33,25 @@ interface ProjectInPool {
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   useTheme();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [projects, setProjects] = useState<ProjectInPool[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextProject, setNextProject] = useState<Project | null>(null);
 
   useEffect(() => {
+    fetchUser();
     fetchProjects();
     fetchNextProject();
   }, []);
+
+  const fetchUser = async () => {
+    try {
+      const response = await api.get<User>('/users/profile/');
+      setUser(response.data);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
 
   const fetchProjects = async () => {
     try {

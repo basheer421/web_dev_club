@@ -4,6 +4,7 @@ import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<boolean>;
   logout: () => void;
@@ -13,6 +14,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
+  setUser: () => {},
   isAuthenticated: false,
   login: async () => false,
   logout: () => {},
@@ -117,6 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return (
     <AuthContext.Provider value={{
       user,
+      setUser,
       isAuthenticated: !!user,
       login,
       logout,
