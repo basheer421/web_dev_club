@@ -17,14 +17,17 @@ class ProjectSerializer(serializers.ModelSerializer):
 class ProjectSubmissionSerializer(serializers.ModelSerializer):
     project = ProjectSerializer(read_only=True)
     submitted_by = UserSerializer(read_only=True)
+    project_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = ProjectSubmission
-        fields = ['id', 'project', 'submitted_by', 'github_repo', 'status', 'created_at', 'updated_at']
-        read_only_fields = ('submitted_by', 'status')
+        fields = ['id', 'project', 'project_id', 'submitted_by', 'github_repo', 'status', 'created_at', 'updated_at']
+        read_only_fields = ('submitted_by', 'status', 'project')
 
     def create(self, validated_data):
-        return ProjectSubmission.objects.create(**validated_data)
+        project_id = validated_data.pop('project_id')
+        project = Project.objects.get(id=project_id)
+        return ProjectSubmission.objects.create(project=project, **validated_data)
 
 class EvaluationSerializer(serializers.ModelSerializer):
     evaluator_username = serializers.CharField(source='evaluator.username', read_only=True)

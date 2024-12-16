@@ -39,19 +39,22 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
     try {
       await api.post("/projects/submit/", {
-        project: project.id,
+        project_id: project.id,
         github_repo: githubRepo,
       });
       setOpenSubmitDialog(false);
       if (onSubmit) onSubmit();
     } catch (error: any) {
-      setError(error.response?.data?.message || "Failed to submit project");
+      setError(error.response?.data?.detail || "Failed to submit project");
     }
   };
 
   const handleViewPdf = () => {
     window.open(project.pdf_file, "_blank");
   };
+
+  const isDisabled = user?.level ? user.level < project.level_required : true;
+  const notEnoughPoints = user?.points ? user.points < project.points_required : true;
 
   return (
     <Box>
@@ -64,12 +67,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
         <Chip
           label={`Level ${project.level_required} Required`}
-          color="primary"
+          color={isDisabled ? "error" : "success"}
           variant="outlined"
         />
         <Chip
           label={`${project.points_required} Points Required`}
-          color="secondary"
+          color={notEnoughPoints ? "error" : "success"}
           variant="outlined"
         />
       </Box>
@@ -92,7 +95,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
           <Button
             variant="contained"
             onClick={() => setOpenSubmitDialog(true)}
-            disabled={user?.level ? user.level < project.level_required : true}
+            disabled={isDisabled || notEnoughPoints}
             sx={{
               background: "linear-gradient(45deg, #64FFDA, #7B89F4)",
               "&:hover": {
@@ -105,11 +108,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         )}
       </Box>
 
-      {/* Submit Dialog */}
-      <Dialog
-        open={openSubmitDialog}
-        onClose={() => setOpenSubmitDialog(false)}
-      >
+      <Dialog open={openSubmitDialog} onClose={() => setOpenSubmitDialog(false)}>
         <DialogTitle>Submit Project</DialogTitle>
         <DialogContent>
           {error && (

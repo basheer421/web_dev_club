@@ -18,27 +18,34 @@ class ProjectSubmissionView(generics.CreateAPIView):
     serializer_class = ProjectSubmissionSerializer
     permission_classes = [IsAuthenticated]
     
-    def perform_create(self, serializer):
-        project = serializer.validated_data['project']
-        user = self.request.user
+    def perform_create(self, serializer: ProjectSubmissionSerializer):
+        try:
+            # Get the project ID from the request data
+            project_id = self.request.data.get('project')
+            project = Project.objects.get(id=project_id)
+            user = self.request.user
+            
+            # Check level requirement
+            if user.level < project.level_required:
+                raise ValidationError(f"You need to be level {project.level_required} to submit this project")
+
+            # Check points requirement
+            if user.points < project.points_required:
+                raise ValidationError(f"You need at least {project.points_required} points to submit this project")
         
-        # Check level requirement
-        if user.level < project.level_required:
-            raise ValidationError(f"You need to be level {project.level_required} to submit this project")
+            # Check if user already submitted this project
+            if ProjectSubmission.objects.filter(project=project, submitted_by=user).exists():
+                raise ValidationError("You have already submitted this project")
+
+            # Deduct points
+            user.points -= project.points_required
+            user.save()
         
-        # Check points requirement
-        if user.points < project.points_required:
-            raise ValidationError(f"You need at least {project.points_required} points to submit this project")
-        
-        # Check if user already submitted this project
-        if ProjectSubmission.objects.filter(project=project, submitted_by=user).exists():
-            raise ValidationError("You have already submitted this project")
-        
-        # Deduct points
-        user.points -= project.points_required
-        user.save()
-        
-        serializer.save(submitted_by=user)
+            serializer.save(submitted_by=user, project=project)
+        except Project.DoesNotExist:
+            raise ValidationError("Project not found")
+        except ValidationError as e:
+            raise ValidationError(e)
 
 class ProjectDetailView(generics.RetrieveAPIView):
     queryset = Project.objects.all()
