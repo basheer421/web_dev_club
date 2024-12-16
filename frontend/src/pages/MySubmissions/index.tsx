@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Paper,
   Typography,
@@ -8,10 +8,9 @@ import {
   Chip,
   Box,
   Button,
-} from '@mui/material';
-import { ProjectSubmission } from '@/types';
-import api from '@/services/api';
-import { getFullFileUrl } from '@/utils/fileUtils';
+} from "@mui/material";
+import { ProjectSubmission } from "@/types";
+import api from "@/services/api";
 
 const MySubmissions: React.FC = () => {
   const [submissions, setSubmissions] = useState<ProjectSubmission[]>([]);
@@ -22,25 +21,30 @@ const MySubmissions: React.FC = () => {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await api.get<ProjectSubmission[]>('/projects/my-submissions/');
+      const response = await api.get<ProjectSubmission[]>(
+        "/projects/my-submissions/"
+      );
       setSubmissions(response.data);
     } catch (error) {
-      console.error('Error fetching submissions:', error);
+      console.error("Error fetching submissions:", error);
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'warning';
-      case 'in_evaluation': return 'info';
-      case 'completed': return 'success';
-      default: return 'default';
+      case "pending":
+        return "warning";
+      case "in_evaluation":
+        return "info";
+      case "completed":
+        return "success";
+      default:
+        return "default";
     }
   };
 
   const handleViewPdf = (pdfUrl: string) => {
-    const fullUrl = getFullFileUrl(pdfUrl);
-    window.open(fullUrl, '_blank');
+    window.open(pdfUrl, "_blank");
   };
 
   return (
@@ -62,7 +66,14 @@ const MySubmissions: React.FC = () => {
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     {submission.project.description}
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
                     <Chip
                       label={`Level ${submission.project.level_required} Required`}
                       color="primary"
@@ -81,7 +92,7 @@ const MySubmissions: React.FC = () => {
                       size="small"
                     />
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Box sx={{ display: "flex", gap: 2 }}>
                     <Button
                       variant="outlined"
                       size="small"
@@ -119,4 +130,4 @@ const MySubmissions: React.FC = () => {
   );
 };
 
-export default MySubmissions; 
+export default MySubmissions;

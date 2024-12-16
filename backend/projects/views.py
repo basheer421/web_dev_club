@@ -113,5 +113,6 @@ class NextProjectView(APIView):
         ).order_by('level_required').first()
 
         if next_project:
-            return Response(ProjectSerializer(next_project).data)
+            serializer = ProjectSerializer(next_project, context={'request': request})
+            return Response(serializer.data)
         return Response({'message': 'No projects available'}, status=status.HTTP_404_NOT_FOUND)

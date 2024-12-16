@@ -7,6 +7,13 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ['id', 'title', 'description', 'pdf_file', 'points_required', 'level_required', 'created_at', 'updated_at']
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get('request')
+        if request and instance.pdf_file:
+            data['pdf_file'] = request.build_absolute_uri(instance.pdf_file.url)
+        return data
+
 class ProjectSubmissionSerializer(serializers.ModelSerializer):
     project = ProjectSerializer(read_only=True)
     submitted_by = UserSerializer(read_only=True)

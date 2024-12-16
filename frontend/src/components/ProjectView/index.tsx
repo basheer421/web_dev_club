@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,11 +10,10 @@ import {
   Typography,
   Chip,
   Alert,
-} from '@mui/material';
-import { Project } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
-import api from '@/services/api';
-import { getFullFileUrl } from '@/utils/fileUtils';
+} from "@mui/material";
+import { Project } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
+import api from "@/services/api";
 
 interface ProjectViewProps {
   project: Project;
@@ -22,34 +21,36 @@ interface ProjectViewProps {
   submissionStatus?: string;
 }
 
-const ProjectView: React.FC<ProjectViewProps> = ({ project, onSubmit, submissionStatus }) => {
+const ProjectView: React.FC<ProjectViewProps> = ({
+  project,
+  onSubmit,
+  submissionStatus,
+}) => {
   const { user } = useAuth();
   const [openSubmitDialog, setOpenSubmitDialog] = useState(false);
-  const [githubRepo, setGithubRepo] = useState('');
+  const [githubRepo, setGithubRepo] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [openPdfDialog, setOpenPdfDialog] = useState(false);
 
   const handleSubmit = async () => {
     if (!githubRepo.trim()) {
-      setError('Please enter a GitHub repository URL');
+      setError("Please enter a GitHub repository URL");
       return;
     }
 
     try {
-      await api.post('/projects/submit/', {
+      await api.post("/projects/submit/", {
         project: project.id,
         github_repo: githubRepo,
       });
       setOpenSubmitDialog(false);
       if (onSubmit) onSubmit();
     } catch (error: any) {
-      setError(error.response?.data?.message || 'Failed to submit project');
+      setError(error.response?.data?.message || "Failed to submit project");
     }
   };
 
   const handleViewPdf = () => {
-    const pdfUrl = getFullFileUrl(project.pdf_file);
-    window.open(pdfUrl, '_blank');
+    window.open(project.pdf_file, "_blank");
   };
 
   return (
@@ -60,7 +61,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onSubmit, submission
       <Typography variant="body1" sx={{ mb: 2 }}>
         {project.description}
       </Typography>
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+      <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
         <Chip
           label={`Level ${project.level_required} Required`}
           color="primary"
@@ -72,20 +73,19 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onSubmit, submission
           variant="outlined"
         />
       </Box>
-      <Box sx={{ display: 'flex', gap: 2 }}>
-        <Button
-          variant="outlined"
-          onClick={handleViewPdf}
-        >
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <Button variant="outlined" onClick={handleViewPdf}>
           View PDF
         </Button>
         {submissionStatus ? (
           <Chip
             label={`Status: ${submissionStatus}`}
             color={
-              submissionStatus === 'pending' ? 'warning' :
-              submissionStatus === 'in_evaluation' ? 'info' :
-              'success'
+              submissionStatus === "pending"
+                ? "warning"
+                : submissionStatus === "in_evaluation"
+                ? "info"
+                : "success"
             }
           />
         ) : (
@@ -94,9 +94,9 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onSubmit, submission
             onClick={() => setOpenSubmitDialog(true)}
             disabled={user?.level ? user.level < project.level_required : true}
             sx={{
-              background: 'linear-gradient(45deg, #64FFDA, #7B89F4)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #5A6AD4, #A5B4FF)',
+              background: "linear-gradient(45deg, #64FFDA, #7B89F4)",
+              "&:hover": {
+                background: "linear-gradient(45deg, #5A6AD4, #A5B4FF)",
               },
             }}
           >
@@ -106,7 +106,10 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onSubmit, submission
       </Box>
 
       {/* Submit Dialog */}
-      <Dialog open={openSubmitDialog} onClose={() => setOpenSubmitDialog(false)}>
+      <Dialog
+        open={openSubmitDialog}
+        onClose={() => setOpenSubmitDialog(false)}
+      >
         <DialogTitle>Submit Project</DialogTitle>
         <DialogContent>
           {error && (
@@ -136,4 +139,4 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onSubmit, submission
   );
 };
 
-export default ProjectView; 
+export default ProjectView;
