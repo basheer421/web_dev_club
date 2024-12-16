@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import { User } from '../types';
-import axios from 'axios';
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +25,11 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  // Initialize user state from localStorage if available
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const checkAuth = async () => {
     try {
@@ -36,17 +39,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
+      api.defaults.headers.common['Authorization'] = `Token ${token}`;
+
+      if (localStorage.getItem('user')) {
+        return;
+      }
+
       const response = await api.get<User>('/users/profile/');
       setUser(response.data);
-    } catch (error) {
-      localStorage.removeItem('token');
-      setUser(null);
+      localStorage.setItem('user', JSON.stringify(response.data));
+    } catch (error: any) {
+      console.error('Check auth failed:', error);
+      
+      // Only clear storage if it's an authentication error
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        delete api.defaults.headers.common['Authorization'];
+        setUser(null);
+      }
     }
   };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
@@ -56,13 +69,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Perform login
       const response = await api.post<{ token: string; user: User }>('/users/login/', credentials);
       
-      // First set the token
+      // Store token and user in localStorage
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+
+      // Set token in axios headers
+      api.defaults.headers.common['Authorization'] = `Token ${response.data.token}`;
       
-      // Then set the user state
       setUser(response.data.user);
-      
-      // Return success
       return true;
     } catch (error) {
       console.error('Login failed:', error);
@@ -76,7 +90,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
+      // Clear localStorage and headers
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      delete api.defaults.headers.common['Authorization'];
       setUser(null);
     }
   };
@@ -84,7 +101,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const setUserAndToken = useCallback((userData: any, token: string) => {
     setUser(userData);
     localStorage.setItem('token', token);
-    axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+    localStorage.setItem('user', JSON.stringify(userData));
+    api.defaults.headers.common['Authorization'] = `Token ${token}`;
+  }, []);
+
+  // Initialize auth state when the app loads
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Token ${token}`;
+      checkAuth(); // Verify token is still valid
+    }
   }, []);
 
   return (

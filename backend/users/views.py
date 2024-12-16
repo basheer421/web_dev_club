@@ -53,6 +53,9 @@ class UserProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     
+    def get(self, request):
+        return Response(UserSerializer(request.user).data)
+
     def patch(self, request):
         user = request.user
         
