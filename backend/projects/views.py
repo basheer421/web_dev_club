@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 from .models import Project, ProjectSubmission, Evaluation
 from .serializers import ProjectSerializer, ProjectSubmissionSerializer, EvaluationSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 # Create your views here.
 
@@ -18,34 +20,84 @@ class ProjectSubmissionView(generics.CreateAPIView):
     serializer_class = ProjectSubmissionSerializer
     permission_classes = [IsAuthenticated]
     
-    def perform_create(self, serializer: ProjectSubmissionSerializer):
+    def create(self, request, *args, **kwargs):
         try:
             # Get the project ID from the request data
-            project_id = self.request.data.get('project')
-            project = Project.objects.get(id=project_id)
-            user = self.request.user
+            project_id = request.data.get('project_id')
+            if not project_id:
+                return Response(
+                    {"detail": "Project ID is required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Get the GitHub repo URL
+            github_repo = request.data.get('github_repo')
+            if not github_repo:
+                return Response(
+                    {"detail": "GitHub repository URL is required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validate project exists
+            try:
+                project = Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                return Response(
+                    {"detail": "Project not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            user = request.user
             
+            # Check if user already submitted this project
+            if ProjectSubmission.objects.filter(project=project, submitted_by=user).exists():
+                return Response(
+                    {"detail": "You have already submitted this project"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             # Check level requirement
             if user.level < project.level_required:
-                raise ValidationError(f"You need to be level {project.level_required} to submit this project")
+                return Response(
+                    {"detail": f"You need to be level {project.level_required} to submit this project"}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
             # Check points requirement
             if user.points < project.points_required:
-                raise ValidationError(f"You need at least {project.points_required} points to submit this project")
-        
-            # Check if user already submitted this project
-            if ProjectSubmission.objects.filter(project=project, submitted_by=user).exists():
-                raise ValidationError("You have already submitted this project")
+                return Response(
+                    {"detail": f"You need at least {project.points_required} points to submit this project"}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Create submission
+            submission = ProjectSubmission.objects.create(
+                project=project,
+                submitted_by=user,
+                github_repo=github_repo
+            )
 
             # Deduct points
             user.points -= project.points_required
             user.save()
-        
-            serializer.save(submitted_by=user, project=project)
-        except Project.DoesNotExist:
-            raise ValidationError("Project not found")
-        except ValidationError as e:
-            raise ValidationError(e)
+
+            # Serialize and return the response
+            serializer = self.get_serializer(submission)
+            return Response(
+                serializer.data, 
+                status=status.HTTP_201_CREATED
+            )
+
+        except DjangoValidationError as e:
+            return Response(
+                {"detail": str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "An unexpected error occurred"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class ProjectDetailView(generics.RetrieveAPIView):
     queryset = Project.objects.all()

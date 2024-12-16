@@ -30,22 +30,47 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   const [openSubmitDialog, setOpenSubmitDialog] = useState(false);
   const [githubRepo, setGithubRepo] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    setError(null);
+    
+    // Validate GitHub URL
     if (!githubRepo.trim()) {
       setError("Please enter a GitHub repository URL");
       return;
     }
 
+    // Simple URL validation
+    try {
+      new URL(githubRepo);
+    } catch {
+      setError("Please enter a valid URL");
+      return;
+    }
+
+    // Validate GitHub URL format
+    if (!githubRepo.match(/^https?:\/\/(www\.)?github\.com\/[\w-]+\/[\w-]+$/)) {
+      setError("Please enter a valid GitHub repository URL");
+      return;
+    }
+
+    setSubmitting(true);
     try {
       await api.post("/projects/submit/", {
         project_id: project.id,
         github_repo: githubRepo,
       });
       setOpenSubmitDialog(false);
+      setGithubRepo("");
       if (onSubmit) onSubmit();
     } catch (error: any) {
-      setError(error.response?.data?.detail || "Failed to submit project");
+      const errorMessage = error.response?.data?.detail || 
+                          error.response?.data?.message ||
+                          "Failed to submit project";
+      setError(errorMessage);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -108,7 +133,16 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         )}
       </Box>
 
-      <Dialog open={openSubmitDialog} onClose={() => setOpenSubmitDialog(false)}>
+      <Dialog 
+        open={openSubmitDialog} 
+        onClose={() => {
+          if (!submitting) {
+            setOpenSubmitDialog(false);
+            setError(null);
+            setGithubRepo("");
+          }
+        }}
+      >
         <DialogTitle>Submit Project</DialogTitle>
         <DialogContent>
           {error && (
@@ -123,14 +157,33 @@ const ProjectView: React.FC<ProjectViewProps> = ({
             type="url"
             fullWidth
             value={githubRepo}
-            onChange={(e) => setGithubRepo(e.target.value)}
+            onChange={(e) => {
+              setGithubRepo(e.target.value);
+              setError(null);
+            }}
             error={Boolean(error)}
+            disabled={submitting}
+            placeholder="https://github.com/username/repository"
+            helperText="Example: https://github.com/username/repository"
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenSubmitDialog(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            Submit
+          <Button 
+            onClick={() => {
+              setOpenSubmitDialog(false);
+              setError(null);
+              setGithubRepo("");
+            }}
+            disabled={submitting}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            variant="contained"
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
