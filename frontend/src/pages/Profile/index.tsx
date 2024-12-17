@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -28,9 +28,10 @@ import api from '../../services/api';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import { User } from '@/types';
 
 const Profile: React.FC = () => {
-  const { user, checkAuth } = useAuth();
+  const { user, setUser, checkAuth } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -92,6 +93,15 @@ const Profile: React.FC = () => {
       setUsernameError(error.response?.data?.error || 'Failed to update username');
     }
   };
+
+  const fetchUser = async () => {
+    const userRes = await api.get<User>('/users/profile/');
+    setUser(userRes.data);
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   return (
     <>

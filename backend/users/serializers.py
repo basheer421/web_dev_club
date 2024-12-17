@@ -8,6 +8,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'points', 'level', 'profile_picture', 'is_approved')
         read_only_fields = ('points', 'level')
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get('request')
+        if request and instance.profile_picture:
+            data['profile_picture'] = request.build_absolute_uri(instance.profile_picture.url)
+        return data
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password_confirm = serializers.CharField(write_only=True, required=True)
 

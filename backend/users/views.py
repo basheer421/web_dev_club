@@ -54,7 +54,7 @@ class UserProfileView(APIView):
     parser_classes = [MultiPartParser, FormParser]
     
     def get(self, request):
-        return Response(UserSerializer(request.user).data)
+        return Response(UserSerializer(request.user, context={'request': request}).data)
 
     def patch(self, request):
         user = request.user
@@ -74,7 +74,7 @@ class UserProfileView(APIView):
             user.username = new_username
         
         user.save()
-        return Response(UserSerializer(user).data)
+        return Response(UserSerializer(user, context={'request': request}).data)
 
 class UserSettingsView(generics.UpdateAPIView):
     serializer_class = UserSerializer
