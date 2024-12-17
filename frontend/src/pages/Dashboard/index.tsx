@@ -87,6 +87,14 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleProjectSubmitSuccess = async () => {
+    await Promise.all([
+      fetchUser(),
+      fetchProjects(),
+      fetchNextProject()
+    ]);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -179,6 +187,7 @@ const Dashboard: React.FC = () => {
           <ProjectView 
             project={nextProject} 
             onSubmit={fetchNextProject}
+            onSubmitSuccess={handleProjectSubmitSuccess}
           />
         ) : (
           <Typography variant="body1" color="text.secondary">

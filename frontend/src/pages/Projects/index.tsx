@@ -92,6 +92,7 @@ const Projects: React.FC = () => {
                     project={project}
                     onSubmit={fetchData}
                     submissionStatus={submission?.status}
+                    onSubmitSuccess={fetchData}
                   />
                 </Paper>
               </Grid>
