@@ -38,9 +38,22 @@ const MySubmissions: React.FC = () => {
         return "info";
       case "completed":
         return "success";
+      case "failed":
+        return "error";
       default:
         return "default";
     }
+  };
+
+  const getStatusMessage = (submission: ProjectSubmission) => {
+    if (submission.status === 'failed') {
+      return (
+        <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+          This submission was rejected. You can submit this project again after gaining a point.
+        </Typography>
+      );
+    }
+    return null;
   };
 
   const handleViewPdf = (pdfUrl: string) => {
@@ -63,9 +76,6 @@ const MySubmissions: React.FC = () => {
               }
               secondary={
                 <Box sx={{ mt: 1 }}>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    {submission.project.description}
-                  </Typography>
                   <Box
                     sx={{
                       display: "flex",
@@ -92,6 +102,7 @@ const MySubmissions: React.FC = () => {
                       size="small"
                     />
                   </Box>
+                  {getStatusMessage(submission)}
                   <Box sx={{ display: "flex", gap: 2 }}>
                     <Button
                       variant="outlined"

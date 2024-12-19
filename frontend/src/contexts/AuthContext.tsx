@@ -16,6 +16,7 @@ interface AuthContextType {
   logout: () => void;
   setUserAndToken: (userData: any, token: string) => void;
   checkAuth: () => Promise<void>;
+  fetchUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -26,6 +27,7 @@ export const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   setUserAndToken: () => {},
   checkAuth: async () => {},
+  fetchUser: async () => {},
 });
 
 interface AuthProviderProps {
@@ -129,6 +131,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const fetchUser = async () => {
+    try {
+      const response = await api.get<User>("/users/profile/");
+      setUser(response.data);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -139,6 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         logout,
         setUserAndToken,
         checkAuth,
+        fetchUser,
       }}
     >
       {children}

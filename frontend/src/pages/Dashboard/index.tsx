@@ -34,7 +34,7 @@ interface ProjectInPool {
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   useTheme();
-  const { user, setUser } = useAuth();
+  const { user, fetchUser } = useAuth();
   const [projects, setProjects] = useState<ProjectInPool[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextProject, setNextProject] = useState<Project | null>(null);
@@ -44,15 +44,6 @@ const Dashboard: React.FC = () => {
     fetchProjects();
     fetchNextProject();
   }, []);
-
-  const fetchUser = async () => {
-    try {
-      const response = await api.get<User>("/users/profile/");
-      setUser(response.data);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    }
-  };
 
   const fetchProjects = async () => {
     try {
@@ -284,7 +275,8 @@ const Dashboard: React.FC = () => {
                         color="text.secondary"
                         component="span"
                       >
-                        Submitted: {new Date(submission.created_at).toLocaleDateString()}
+                        Submitted:{" "}
+                        {new Date(submission.created_at).toLocaleDateString()}
                       </Typography>
                     </Box>
                   }

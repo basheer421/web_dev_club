@@ -19,6 +19,7 @@ class ProjectSubmission(models.Model):
         ('pending', 'Pending'),
         ('in_evaluation', 'In Evaluation'),
         ('completed', 'Completed'),
+        ('failed', 'Failed'),
     ]
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='submissions')

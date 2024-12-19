@@ -20,7 +20,6 @@ class ProjectSubmissionView(generics.CreateAPIView):
     
     def create(self, request, *args, **kwargs):
         try:
-            # Get the project ID from the request data
             project_id = request.data.get('project_id')
             if not project_id:
                 return Response(
@@ -28,7 +27,6 @@ class ProjectSubmissionView(generics.CreateAPIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Get the GitHub repo URL
             github_repo = request.data.get('github_repo')
             if not github_repo:
                 return Response(
@@ -36,7 +34,6 @@ class ProjectSubmissionView(generics.CreateAPIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Validate project exists
             try:
                 project = Project.objects.get(id=project_id)
             except Project.DoesNotExist:
@@ -47,8 +44,14 @@ class ProjectSubmissionView(generics.CreateAPIView):
 
             user = request.user
             
-            # Check if user already submitted this project
-            if ProjectSubmission.objects.filter(project=project, submitted_by=user).exists():
+            # Check if user has a pending or completed submission for this project
+            existing_submission = ProjectSubmission.objects.filter(
+                project=project, 
+                submitted_by=user,
+                status__in=['pending', 'completed']
+            ).exists()
+
+            if existing_submission:
                 return Response(
                     {"detail": "You have already submitted this project"}, 
                     status=status.HTTP_400_BAD_REQUEST
@@ -79,7 +82,6 @@ class ProjectSubmissionView(generics.CreateAPIView):
             user.points -= project.points_required
             user.save()
 
-            # Serialize and return the response
             serializer = self.get_serializer(submission)
             return Response(
                 serializer.data, 
@@ -101,7 +103,7 @@ class EvaluationPoolView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        # Exclude submissions by the current user and only show pending ones
+        # Exclude submissions by the current user and show only pending ones
         return ProjectSubmission.objects.filter(
             status='pending'
         ).exclude(
@@ -128,15 +130,19 @@ class EvaluationView(generics.CreateAPIView):
             submission=submission
         )
         
-        # Update submission status based on evaluation
-        submission.status = 'completed'
-        submission.save()
-        
+        # Handle evaluation result
         if evaluation.is_approved:
-            # Increase submitter's level
+            # If approved, mark as completed and level up the user
+            submission.status = 'completed'
+            submission.save()
+            
             submitter = submission.submitted_by
             submitter.level += 1
             submitter.save()
+        else:
+            # If failed, mark as failed but keep the record
+            submission.status = 'failed'
+            submission.save()
         
         # Give points to evaluator
         self.request.user.points += 1
@@ -172,7 +178,8 @@ class NextProjectView(APIView):
         next_project = Project.objects.filter(
             level_required__lte=user.level
         ).exclude(
-            submissions__submitted_by=user
+            submissions__submitted_by=user,
+            submissions__status__in=['pending', 'completed']
         ).order_by('level_required').first()
 
         if next_project:

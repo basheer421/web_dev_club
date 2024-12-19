@@ -36,7 +36,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
   const handleSubmit = async () => {
     setError(null);
-    
+
     // Validate GitHub URL
     if (!githubRepo.trim()) {
       setError("Please enter a GitHub repository URL");
@@ -66,14 +66,15 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       setOpenSubmitDialog(false);
       setGithubRepo("");
       if (onSubmit) onSubmit();
-      
+
       if (onSubmitSuccess) {
         await onSubmitSuccess();
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 
-                          error.response?.data?.message ||
-                          "Failed to submit project";
+      const errorMessage =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        "Failed to submit project";
       setError(errorMessage);
     } finally {
       setSubmitting(false);
@@ -84,8 +85,29 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     window.open(project.pdf_file, "_blank");
   };
 
-  const isDisabled = user?.level ? user.level < project.level_required : true;
-  const notEnoughPoints = user?.points ? user.points < project.points_required : true;
+  const getSubmitButtonText = () => {
+    if (submissionStatus === "pending") return "Pending Evaluation";
+    if (submissionStatus === "completed") return "Completed";
+    if (submissionStatus === "failed") return "Submit Again";
+    return "Submit Project";
+  };
+
+  const isDisabled = () => {
+    const notEnoughLevel = user?.level
+      ? user.level < project.level_required
+      : true;
+    const notEnoughPoints = user?.points
+      ? user.points < project.points_required
+      : true;
+
+    // If level or points requirements not met, disable submission
+    if (notEnoughLevel || notEnoughPoints) {
+      return true;
+    }
+
+    // Only allow submission if status is undefined (new submission) or failed
+    return submissionStatus === "pending" || submissionStatus === "completed";
+  };
 
   return (
     <Box>
@@ -98,12 +120,20 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
         <Chip
           label={`Level ${project.level_required} Required`}
-          color={isDisabled ? "error" : "success"}
+          color={
+            user?.level && user.level >= project.level_required
+              ? "success"
+              : "error"
+          }
           variant="outlined"
         />
         <Chip
           label={`${project.points_required} Points Required`}
-          color={notEnoughPoints ? "error" : "success"}
+          color={
+            user?.points && user.points >= project.points_required
+              ? "success"
+              : "error"
+          }
           variant="outlined"
         />
       </Box>
@@ -111,22 +141,22 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         <Button variant="outlined" onClick={handleViewPdf}>
           View PDF
         </Button>
-        {submissionStatus ? (
+        {submissionStatus && submissionStatus !== "failed" ? (
           <Chip
             label={`Status: ${submissionStatus}`}
             color={
               submissionStatus === "pending"
                 ? "warning"
-                : submissionStatus === "in_evaluation"
-                ? "info"
-                : "success"
+                : submissionStatus === "completed"
+                ? "success"
+                : "default"
             }
           />
         ) : (
           <Button
             variant="contained"
             onClick={() => setOpenSubmitDialog(true)}
-            disabled={isDisabled || notEnoughPoints}
+            disabled={isDisabled()}
             sx={{
               background: "linear-gradient(45deg, #64FFDA, #7B89F4)",
               "&:hover": {
@@ -134,13 +164,13 @@ const ProjectView: React.FC<ProjectViewProps> = ({
               },
             }}
           >
-            Submit Project
+            {getSubmitButtonText()}
           </Button>
         )}
       </Box>
 
-      <Dialog 
-        open={openSubmitDialog} 
+      <Dialog
+        open={openSubmitDialog}
         onClose={() => {
           if (!submitting) {
             setOpenSubmitDialog(false);
@@ -174,7 +204,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button 
+          <Button
             onClick={() => {
               setOpenSubmitDialog(false);
               setError(null);
@@ -184,8 +214,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             variant="contained"
             disabled={submitting}
           >

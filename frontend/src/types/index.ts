@@ -25,7 +25,7 @@ export interface ProjectSubmission {
   project: Project;
   submitted_by: User;
   github_repo: string;
-  status: 'pending' | 'in_evaluation' | 'completed';
+  status: 'pending' | 'in_evaluation' | 'completed' | 'failed';
   created_at: string;
   updated_at: string;
 }

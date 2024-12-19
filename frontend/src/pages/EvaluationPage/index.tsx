@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -12,14 +12,14 @@ import {
   Alert,
   Card,
   CardContent,
-} from '@mui/material';
-import api from '../../services/api';
-import { ProjectSubmission } from '../../types';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import ReactMarkdown from 'react-markdown';
+} from "@mui/material";
+import api from "../../services/api";
+import { ProjectSubmission } from "../../types";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ReactMarkdown from "react-markdown";
 
 const EvaluationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,7 +29,7 @@ const EvaluationPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [evaluation, setEvaluation] = useState({
-    comments: '',
+    comments: "",
     is_approved: false,
   });
 
@@ -42,8 +42,8 @@ const EvaluationPage: React.FC = () => {
       const response = await api.get(`/projects/evaluation/${id}/`);
       setSubmission(response.data.submission);
     } catch (error) {
-      setError('Failed to load submission');
-      console.error('Error fetching submission:', error);
+      setError("Failed to load submission");
+      console.error("Error fetching submission:", error);
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ const EvaluationPage: React.FC = () => {
 
   const handleSubmit = async (approved: boolean) => {
     if (!evaluation.comments.trim()) {
-      setError('Please provide evaluation comments');
+      setError("Please provide evaluation comments");
       return;
     }
 
@@ -59,11 +59,12 @@ const EvaluationPage: React.FC = () => {
     try {
       await api.post(`/projects/evaluate/${id}/`, {
         comments: evaluation.comments.trim(),
-        is_approved: approved
+        is_approved: approved,
       });
-      navigate('/dashboard');
+
+      navigate("/dashboard");
     } catch (error: any) {
-      setError(error.response?.data?.detail || 'Failed to submit evaluation');
+      setError(error.response?.data?.detail || "Failed to submit evaluation");
     } finally {
       setSubmitting(false);
     }
@@ -72,7 +73,12 @@ const EvaluationPage: React.FC = () => {
   if (loading) {
     return (
       <>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+        >
           <CircularProgress />
         </Box>
       </>
@@ -108,7 +114,7 @@ const EvaluationPage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" paragraph>
                   {submission.project.description}
                 </Typography>
-                <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
                   <Button
                     variant="outlined"
                     startIcon={<PictureAsPdfIcon />}
@@ -131,18 +137,20 @@ const EvaluationPage: React.FC = () => {
                   <Typography variant="h6" gutterBottom>
                     Evaluation Guidelines
                   </Typography>
-                  <Box sx={{ 
-                    mt: 2, 
-                    p: 2, 
-                    bgcolor: 'background.paper',
-                    borderRadius: 1,
-                    '& pre': { 
-                      bgcolor: 'background.default',
-                      p: 1,
+                  <Box
+                    sx={{
+                      mt: 2,
+                      p: 2,
+                      bgcolor: "background.paper",
                       borderRadius: 1,
-                      overflow: 'auto'
-                    }
-                  }}>
+                      "& pre": {
+                        bgcolor: "background.default",
+                        p: 1,
+                        borderRadius: 1,
+                        overflow: "auto",
+                      },
+                    }}
+                  >
                     <ReactMarkdown>
                       {submission.project.evaluation_markdown}
                     </ReactMarkdown>
@@ -177,9 +185,11 @@ const EvaluationPage: React.FC = () => {
                 rows={6}
                 label="Evaluation Comments"
                 value={evaluation.comments}
-                onChange={(e) => setEvaluation({ ...evaluation, comments: e.target.value })}
+                onChange={(e) =>
+                  setEvaluation({ ...evaluation, comments: e.target.value })
+                }
                 error={Boolean(error && !evaluation.comments.trim())}
-                helperText={error && !evaluation.comments.trim() ? error : ''}
+                helperText={error && !evaluation.comments.trim() ? error : ""}
                 sx={{ mb: 3 }}
               />
 
@@ -189,7 +199,7 @@ const EvaluationPage: React.FC = () => {
                 </Alert>
               )}
 
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+              <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
                 <Button
                   variant="outlined"
                   color="error"
@@ -217,4 +227,4 @@ const EvaluationPage: React.FC = () => {
   );
 };
 
-export default EvaluationPage; 
+export default EvaluationPage;

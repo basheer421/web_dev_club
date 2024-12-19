@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Paper,
@@ -7,10 +7,11 @@ import {
   Tabs,
   Tab,
   CircularProgress,
-} from '@mui/material';
-import { Project, ProjectSubmission } from '@/types';
-import api from '@/services/api';
-import ProjectView from '@/components/ProjectView';
+} from "@mui/material";
+import { Project, ProjectSubmission } from "@/types";
+import api from "@/services/api";
+import ProjectView from "@/components/ProjectView";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -21,16 +22,8 @@ interface TabPanelProps {
 const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+    <div role="tabpanel" hidden={value !== index} {...other}>
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 };
@@ -40,6 +33,7 @@ const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [mySubmissions, setMySubmissions] = useState<ProjectSubmission[]>([]);
   const [tabValue, setTabValue] = useState(0);
+  const { fetchUser } = useAuth();
 
   useEffect(() => {
     fetchData();
@@ -47,14 +41,16 @@ const Projects: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const [projectsRes, submissionsRes] = await Promise.all([
-        api.get<Project[]>('/projects/'),
-        api.get<ProjectSubmission[]>('/projects/my-submissions/')
+      setLoading(true);
+      const [, projectsRes, submissionsRes] = await Promise.all([
+        fetchUser(),
+        api.get<Project[]>("/projects/"),
+        api.get<ProjectSubmission[]>("/projects/my-submissions/"),
       ]);
       setProjects(projectsRes.data);
       setMySubmissions(submissionsRes.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
@@ -66,15 +62,20 @@ const Projects: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="50vh"
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Paper sx={{ width: '100%', mb: 2 }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+    <Paper sx={{ width: "100%", mb: 2 }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab label="Available Projects" />
           <Tab label="My Submissions" />
@@ -84,11 +85,13 @@ const Projects: React.FC = () => {
       <TabPanel value={tabValue} index={0}>
         <Grid container spacing={3}>
           {projects.map((project) => {
-            const submission = mySubmissions.find(s => s.project.id === project.id);
+            const submission = mySubmissions.find(
+              (s) => s.project.id === project.id
+            );
             return (
               <Grid item xs={12} key={project.id}>
                 <Paper sx={{ p: 3 }}>
-                  <ProjectView 
+                  <ProjectView
                     project={project}
                     onSubmit={fetchData}
                     submissionStatus={submission?.status}
@@ -113,7 +116,7 @@ const Projects: React.FC = () => {
           {mySubmissions.map((submission) => (
             <Grid item xs={12} key={submission.id}>
               <Paper sx={{ p: 3 }}>
-                <ProjectView 
+                <ProjectView
                   project={submission.project}
                   submissionStatus={submission.status}
                 />
@@ -133,4 +136,4 @@ const Projects: React.FC = () => {
   );
 };
 
-export default Projects; 
+export default Projects;
