@@ -151,8 +151,11 @@ class EvaluationDetailView(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         submission = self.get_object()
-        submission_data = ProjectSubmissionSerializer(submission, context={'request': request}).data
-        return Response({'submission': submission_data})
+        if (submission.status == 'pending'):
+            submission_data = ProjectSubmissionSerializer(submission, context={'request': request}).data
+            return Response({'submission': submission_data})
+        else:
+            return Response({'message': 'Submission is not pending'}, status=status.HTTP_404_NOT_FOUND)
 
 class UserProjectSubmissionsView(generics.ListAPIView):
     serializer_class = ProjectSubmissionSerializer
