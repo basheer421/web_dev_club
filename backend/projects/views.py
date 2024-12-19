@@ -101,7 +101,14 @@ class EvaluationPoolView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return ProjectSubmission.objects.filter(status='pending')
+        # Exclude submissions by the current user and only show pending ones
+        return ProjectSubmission.objects.filter(
+            status='pending'
+        ).exclude(
+            submitted_by=self.request.user
+        ).select_related(
+            'project', 'submitted_by'
+        )
 
 class EvaluationView(generics.CreateAPIView):
     serializer_class = EvaluationSerializer

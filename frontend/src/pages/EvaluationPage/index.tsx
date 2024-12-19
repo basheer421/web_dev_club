@@ -96,7 +96,7 @@ const EvaluationPage: React.FC = () => {
       ) : (
         <Grid container spacing={3}>
           {/* Project Details */}
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -108,7 +108,7 @@ const EvaluationPage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" paragraph>
                   {submission.project.description}
                 </Typography>
-                <Box sx={{ mt: 2, display: 'flex', gap: 1, flexDirection: 'column' }}>
+                <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
                   <Button
                     variant="outlined"
                     startIcon={<PictureAsPdfIcon />}
@@ -121,9 +121,12 @@ const EvaluationPage: React.FC = () => {
                 </Box>
               </CardContent>
             </Card>
+          </Grid>
 
+          {/* Evaluation Guidelines */}
+          <Grid item xs={12}>
             {submission.project.evaluation_markdown && (
-              <Card sx={{ mt: 2 }}>
+              <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     Evaluation Guidelines
@@ -150,8 +153,8 @@ const EvaluationPage: React.FC = () => {
           </Grid>
 
           {/* Submission Details */}
-          <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3, mb: 3 }}>
+          <Grid item xs={12}>
+            <Paper sx={{ p: 3 }}>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="h6" gutterBottom>
                   Submission by {submission.submitted_by.username}

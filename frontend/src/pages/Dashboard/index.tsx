@@ -56,12 +56,7 @@ const Dashboard: React.FC = () => {
 
   const fetchProjects = async () => {
     try {
-      const projects = await api.get<Project[]>("/projects/");
       const response = await api.get<ProjectInPool[]>("/projects/pool/");
-      for (const project of response.data) {
-        project.project =
-          projects.data.find((p) => p.id === project.id) || project.project;
-      }
       setProjects(response.data);
     } catch (error) {
       console.error("Error fetching projects:", error);
@@ -252,8 +247,8 @@ const Dashboard: React.FC = () => {
         </Box>
         <Divider sx={{ mb: 2 }} />
         <List>
-          {projects.map((project, index) => (
-            <React.Fragment key={project.id}>
+          {projects.map((submission, index) => (
+            <React.Fragment key={submission.id}>
               {index > 0 && <Divider />}
               <ListItem
                 sx={{
@@ -266,7 +261,7 @@ const Dashboard: React.FC = () => {
                 <ListItemText
                   primary={
                     <Typography variant="h6" component="div">
-                      {project.project.title}
+                      {submission.project.title}
                     </Typography>
                   }
                   secondary={
@@ -280,7 +275,7 @@ const Dashboard: React.FC = () => {
                       }}
                     >
                       <Chip
-                        label={`${project.project.points_required} Points Required`}
+                        label={`${submission.project.points_required} Points Required`}
                         size="small"
                         color="secondary"
                       />
@@ -289,7 +284,7 @@ const Dashboard: React.FC = () => {
                         color="text.secondary"
                         component="span"
                       >
-                        Submitted: {new Date(project.created_at).toLocaleDateString()}
+                        Submitted: {new Date(submission.created_at).toLocaleDateString()}
                       </Typography>
                     </Box>
                   }
@@ -297,11 +292,11 @@ const Dashboard: React.FC = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => handleEvaluate(project.id)}
-                  disabled={project.submitted_by.id === user?.id}
+                  onClick={() => handleEvaluate(submission.id)}
+                  disabled={submission.submitted_by.id === user?.id}
                   sx={{ ml: 2, minWidth: 120 }}
                 >
-                  {project.submitted_by.id === user?.id
+                  {submission.submitted_by.id === user?.id
                     ? "Your Submission"
                     : "Evaluate"}
                 </Button>
