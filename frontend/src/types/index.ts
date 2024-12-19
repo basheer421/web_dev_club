@@ -13,6 +13,7 @@ export interface Project {
   title: string;
   description: string;
   pdf_file: string;
+  evaluation_markdown: string | null;
   points_required: number;
   level_required: number;
   created_at: string;

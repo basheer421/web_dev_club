@@ -6,8 +6,6 @@ from django.core.exceptions import ValidationError
 from .models import Project, ProjectSubmission, Evaluation
 from .serializers import ProjectSerializer, ProjectSubmissionSerializer, EvaluationSerializer
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
-from django.core.exceptions import ValidationError as DjangoValidationError
 
 # Create your views here.
 
@@ -88,11 +86,6 @@ class ProjectSubmissionView(generics.CreateAPIView):
                 status=status.HTTP_201_CREATED
             )
 
-        except DjangoValidationError as e:
-            return Response(
-                {"detail": str(e)}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
         except Exception as e:
             return Response(
                 {"detail": "An unexpected error occurred"}, 
@@ -117,7 +110,6 @@ class EvaluationView(generics.CreateAPIView):
     def perform_create(self, serializer):
         submission = ProjectSubmission.objects.get(pk=self.kwargs['pk'])
         
-        # Check if user is trying to evaluate their own submission
         if submission.submitted_by == self.request.user:
             raise ValidationError("You cannot evaluate your own submission")
             
@@ -130,7 +122,7 @@ class EvaluationView(generics.CreateAPIView):
         )
         
         # Update submission status based on evaluation
-        submission.status = 'completed' if evaluation.is_approved else 'pending'
+        submission.status = 'completed'
         submission.save()
         
         if evaluation.is_approved:
@@ -143,8 +135,6 @@ class EvaluationView(generics.CreateAPIView):
         self.request.user.points += 1
         self.request.user.save()
 
-        return Response(EvaluationSerializer(evaluation).data)
-
 class EvaluationDetailView(generics.RetrieveAPIView):
     serializer_class = ProjectSubmissionSerializer
     permission_classes = [IsAuthenticated]
@@ -152,8 +142,12 @@ class EvaluationDetailView(generics.RetrieveAPIView):
     def get_object(self):
         return ProjectSubmission.objects.get(pk=self.kwargs['pk'])
 
+    def get(self, request, *args, **kwargs):
+        submission = self.get_object()
+        submission_data = ProjectSubmissionSerializer(submission, context={'request': request}).data
+        return Response({'submission': submission_data})
+
 class UserProjectSubmissionsView(generics.ListAPIView):
-    """List all submissions by the current user"""
     serializer_class = ProjectSubmissionSerializer
     permission_classes = [permissions.IsAuthenticated]
 

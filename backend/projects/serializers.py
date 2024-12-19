@@ -5,7 +5,7 @@ from users.serializers import UserSerializer
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['id', 'title', 'description', 'pdf_file', 'points_required', 'level_required', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'pdf_file', 'evaluation_markdown', 'points_required', 'level_required', 'created_at', 'updated_at']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -30,10 +30,9 @@ class ProjectSubmissionSerializer(serializers.ModelSerializer):
         return ProjectSubmission.objects.create(project=project, **validated_data)
 
 class EvaluationSerializer(serializers.ModelSerializer):
-    evaluator_username = serializers.CharField(source='evaluator.username', read_only=True)
-
+    evaluator = UserSerializer(read_only=True)
+    
     class Meta:
         model = Evaluation
-        fields = ['id', 'submission', 'evaluator', 'evaluator_username', 
-                 'comments', 'is_approved', 'created_at']
-        read_only_fields = ('evaluator', 'submission') 
+        fields = ['id', 'comments', 'is_approved', 'evaluator', 'created_at']
+        read_only_fields = ('evaluator',)

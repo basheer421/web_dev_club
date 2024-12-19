@@ -5,6 +5,7 @@ class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     pdf_file = models.FileField(upload_to='projects/pdfs/')
+    evaluation_markdown = models.TextField(blank=True, null=True, help_text="Evaluation guidelines in markdown format")
     points_required = models.IntegerField(default=1)
     level_required = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -42,10 +43,3 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return f"Evaluation for {self.submission}"
-
-    def save(self, *args, **kwargs):
-        # Update submission status when evaluation is created
-        if not self.pk:  # New evaluation
-            self.submission.status = 'in_evaluation'
-            self.submission.save()
-        super().save(*args, **kwargs)

@@ -7,13 +7,11 @@ import {
   Grid,
   TextField,
   Button,
-  Chip,
   Link,
   CircularProgress,
   Alert,
   Card,
   CardContent,
-  Divider,
 } from '@mui/material';
 import api from '../../services/api';
 import { ProjectSubmission } from '../../types';
@@ -21,6 +19,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ReactMarkdown from 'react-markdown';
 
 const EvaluationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,15 +39,8 @@ const EvaluationPage: React.FC = () => {
 
   const fetchSubmission = async () => {
     try {
-      const response = await api.get<ProjectSubmission>(`/projects/evaluation/${id}/`);
-      
-      // Check if the submission is the user's own
-      if (response.data.submitted_by.id === user?.id) {
-        setError("You cannot evaluate your own submission");
-        setSubmission(null);
-      } else {
-        setSubmission(response.data);
-      }
+      const response = await api.get(`/projects/evaluation/${id}/`);
+      setSubmission(response.data.submission);
     } catch (error) {
       setError('Failed to load submission');
       console.error('Error fetching submission:', error);
@@ -69,10 +61,9 @@ const EvaluationPage: React.FC = () => {
         comments: evaluation.comments.trim(),
         is_approved: approved
       });
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       setError(error.response?.data?.detail || 'Failed to submit evaluation');
-      console.error('Error submitting evaluation:', error);
     } finally {
       setSubmitting(false);
     }
@@ -111,14 +102,13 @@ const EvaluationPage: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   Project Details
                 </Typography>
-                <Divider sx={{ mb: 2 }} />
                 <Typography variant="subtitle1" gutterBottom>
                   {submission.project.title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
                   {submission.project.description}
                 </Typography>
-                <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                <Box sx={{ mt: 2, display: 'flex', gap: 1, flexDirection: 'column' }}>
                   <Button
                     variant="outlined"
                     startIcon={<PictureAsPdfIcon />}
@@ -126,11 +116,37 @@ const EvaluationPage: React.FC = () => {
                     href={submission.project.pdf_file}
                     target="_blank"
                   >
-                    View Requirements
+                    View Project Requirements
                   </Button>
                 </Box>
               </CardContent>
             </Card>
+
+            {submission.project.evaluation_markdown && (
+              <Card sx={{ mt: 2 }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Evaluation Guidelines
+                  </Typography>
+                  <Box sx={{ 
+                    mt: 2, 
+                    p: 2, 
+                    bgcolor: 'background.paper',
+                    borderRadius: 1,
+                    '& pre': { 
+                      bgcolor: 'background.default',
+                      p: 1,
+                      borderRadius: 1,
+                      overflow: 'auto'
+                    }
+                  }}>
+                    <ReactMarkdown>
+                      {submission.project.evaluation_markdown}
+                    </ReactMarkdown>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
           </Grid>
 
           {/* Submission Details */}

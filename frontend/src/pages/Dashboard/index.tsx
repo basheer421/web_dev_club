@@ -269,40 +269,29 @@ const Dashboard: React.FC = () => {
                       {project.project.title}
                     </Typography>
                   }
-                  secondaryTypographyProps={{ component: "div" }}
                   secondary={
-                    <>
+                    <Box
+                      component="div"
+                      sx={{
+                        display: "flex",
+                        gap: 1,
+                        alignItems: "center",
+                        mt: 1,
+                      }}
+                    >
+                      <Chip
+                        label={`${project.project.points_required} Points Required`}
+                        size="small"
+                        color="secondary"
+                      />
                       <Typography
-                        variant="body2"
+                        variant="caption"
                         color="text.secondary"
-                        component="div"
-                        sx={{ mb: 1 }}
+                        component="span"
                       >
-                        {project.project.description}
+                        Submitted: {new Date(project.created_at).toLocaleDateString()}
                       </Typography>
-                      <Box
-                        component="div"
-                        sx={{
-                          display: "flex",
-                          gap: 1,
-                          alignItems: "center",
-                        }}
-                      >
-                        <Chip
-                          label={`${project.project.points_required} Points Required`}
-                          size="small"
-                          color="secondary"
-                        />
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          component="span"
-                        >
-                          Submitted:{" "}
-                          {new Date(project.created_at).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    </>
+                    </Box>
                   }
                 />
                 <Button
