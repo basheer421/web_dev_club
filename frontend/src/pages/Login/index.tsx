@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   Container,
   Paper,
@@ -8,12 +8,10 @@ import {
   Button,
   Typography,
   Box,
-  Divider,
   Alert,
   Snackbar,
-} from '@mui/material';
-import GoogleIcon from '@mui/icons-material/Google';
-import BackToHome from '@/components/BackToHome';
+} from "@mui/material";
+import BackToHome from "@/components/BackToHome";
 
 interface LoginFormData {
   email: string;
@@ -25,13 +23,13 @@ const Login: React.FC = () => {
   const location = useLocation();
   const { login, user } = useAuth();
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [showError, setShowError] = useState(false);
 
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || "/dashboard";
 
   useEffect(() => {
     if (user) {
@@ -48,19 +46,15 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setShowError(false);
-    
+
     try {
       await login(formData);
     } catch (error) {
-      setError('Invalid email or password');
+      setError("Invalid email or password");
       setShowError(true);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/accounts/google/login/`;
   };
 
   const handleCloseError = () => {
@@ -109,31 +103,29 @@ const Login: React.FC = () => {
           >
             Sign In
           </Button>
-          <Box sx={{ textAlign: 'center', mt: 2 }}>
-            <Link to="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Box sx={{ textAlign: "center", mt: 2 }}>
+            <Link
+              to="/register"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
               <Typography variant="body2" color="primary">
                 Don't have an account? Sign up
               </Typography>
             </Link>
           </Box>
-          <Divider sx={{ my: 2 }}>or</Divider>
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<GoogleIcon />}
-            onClick={handleGoogleLogin}
-          >
-            Sign in with Google
-          </Button>
         </Box>
       </Paper>
-      <Snackbar 
-        open={showError} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={showError}
+        autoHideDuration={6000}
         onClose={handleCloseError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseError}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
           {error}
         </Alert>
       </Snackbar>
@@ -141,4 +133,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

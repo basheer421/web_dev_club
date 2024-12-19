@@ -25,7 +25,6 @@ services:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost:8000/api
-      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - HOST=0.0.0.0
     depends_on:
       - backend

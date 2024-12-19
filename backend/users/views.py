@@ -82,13 +82,6 @@ class UserSettingsView(generics.UpdateAPIView):
     def get_object(self):
         return self.request.user
 
-class GoogleLoginView(APIView):
-    permission_classes = [permissions.AllowAny]
-    
-    def post(self, request):
-        # Google login logic here
-        pass
-
 class UserApprovalView(APIView):
     permission_classes = [permissions.AllowAny]
     

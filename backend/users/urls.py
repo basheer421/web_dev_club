@@ -9,5 +9,4 @@ urlpatterns = [
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
     path('profile/', views.UserProfileView.as_view(), name='user-profile'),
     path('settings/', views.UserSettingsView.as_view(), name='settings'),
-    path('google/login/', views.GoogleLoginView.as_view(), name='google-login'),
 ] 
