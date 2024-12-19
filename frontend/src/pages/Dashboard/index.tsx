@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   List,
   ListItem,
@@ -14,13 +14,14 @@ import {
   CardContent,
   Chip,
   useTheme,
-} from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import api from '../../services/api';
-import { Project, User } from '../../types';
-import { useAuth } from '../../contexts/AuthContext';
-import ProjectView from '@/components/ProjectView';
+} from "@mui/material";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import api from "../../services/api";
+import { Project, User } from "../../types";
+import { useAuth } from "../../contexts/AuthContext";
+import ProjectView from "@/components/ProjectView";
+import axios from "axios";
 
 interface ProjectInPool {
   id: number;
@@ -46,23 +47,24 @@ const Dashboard: React.FC = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await api.get<User>('/users/profile/');
+      const response = await api.get<User>("/users/profile/");
       setUser(response.data);
     } catch (error) {
-      console.error('Error fetching user:', error);
+      console.error("Error fetching user:", error);
     }
   };
 
   const fetchProjects = async () => {
     try {
-      const projects = await api.get<Project[]>('/projects/');
-      const response = await api.get<ProjectInPool[]>('/projects/pool/');
+      const projects = await api.get<Project[]>("/projects/");
+      const response = await api.get<ProjectInPool[]>("/projects/pool/");
       for (const project of response.data) {
-        project.project = projects.data.find(p => p.id === project.id) || project.project;
+        project.project =
+          projects.data.find((p) => p.id === project.id) || project.project;
       }
       setProjects(response.data);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      console.error("Error fetching projects:", error);
     } finally {
       setLoading(false);
     }
@@ -70,10 +72,18 @@ const Dashboard: React.FC = () => {
 
   const fetchNextProject = async () => {
     try {
-      const response = await api.get<Project>('/projects/next/');
+      const response = await api.get<Project>("/projects/next/");
       setNextProject(response.data);
     } catch (error) {
-      console.error('Error fetching next project:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          setNextProject(null);
+        } else {
+          console.error("Error fetching next project:", error.response?.data);
+        }
+      } else {
+        console.error("Error fetching next project:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -83,16 +93,12 @@ const Dashboard: React.FC = () => {
     try {
       navigate(`/evaluation/${projectId}`);
     } catch (error) {
-      console.error('Error starting evaluation:', error);
+      console.error("Error starting evaluation:", error);
     }
   };
 
   const handleProjectSubmitSuccess = async () => {
-    await Promise.all([
-      fetchUser(),
-      fetchProjects(),
-      fetchNextProject()
-    ]);
+    await Promise.all([fetchUser(), fetchProjects(), fetchNextProject()]);
   };
 
   if (loading) {
@@ -104,23 +110,32 @@ const Dashboard: React.FC = () => {
       {/* User Stats Section */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={4}>
-          <Card sx={{ 
-            height: '100%', 
-            background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(123, 137, 244, 0.15))',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(100, 255, 218, 0.2)',
-          }}>
+          <Card
+            sx={{
+              height: "100%",
+              background:
+                "linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(123, 137, 244, 0.15))",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(100, 255, 218, 0.2)",
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: "text.primary" }}
+              >
                 Welcome back, {user?.username}!
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <EmojiEventsIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
+              <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                <EmojiEventsIcon
+                  sx={{ fontSize: 40, mr: 2, color: "primary.main" }}
+                />
                 <Box>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     Current Level
                   </Typography>
-                  <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                  <Typography variant="h4" sx={{ color: "text.primary" }}>
                     {user?.level}
                   </Typography>
                 </Box>
@@ -129,19 +144,28 @@ const Dashboard: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card sx={{ 
-            height: '100%',
-            background: 'linear-gradient(135deg, rgba(123, 137, 244, 0.15), rgba(100, 255, 218, 0.15))',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(123, 137, 244, 0.2)',
-          }}>
+          <Card
+            sx={{
+              height: "100%",
+              background:
+                "linear-gradient(135deg, rgba(123, 137, 244, 0.15), rgba(100, 255, 218, 0.15))",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(123, 137, 244, 0.2)",
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: "text.primary" }}
+              >
                 Available Points
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <AssignmentIcon sx={{ fontSize: 40, mr: 2, color: 'secondary.main' }} />
-                <Typography variant="h4" sx={{ color: 'text.primary' }}>
+              <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                <AssignmentIcon
+                  sx={{ fontSize: 40, mr: 2, color: "secondary.main" }}
+                />
+                <Typography variant="h4" sx={{ color: "text.primary" }}>
                   {user?.points}
                 </Typography>
               </Box>
@@ -149,19 +173,28 @@ const Dashboard: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card sx={{ 
-            height: '100%',
-            background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(100, 255, 218, 0.05))',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(100, 255, 218, 0.2)',
-          }}>
+          <Card
+            sx={{
+              height: "100%",
+              background:
+                "linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(100, 255, 218, 0.05))",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(100, 255, 218, 0.2)",
+            }}
+          >
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: "text.primary" }}
+              >
                 Projects to Evaluate
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <AssignmentIcon sx={{ fontSize: 40, mr: 2, color: 'success.light' }} />
-                <Typography variant="h4" sx={{ color: 'text.primary' }}>
+              <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                <AssignmentIcon
+                  sx={{ fontSize: 40, mr: 2, color: "success.light" }}
+                />
+                <Typography variant="h4" sx={{ color: "text.primary" }}>
                   {projects.length}
                 </Typography>
               </Box>
@@ -171,38 +204,47 @@ const Dashboard: React.FC = () => {
       </Grid>
 
       {/* Next Project Box */}
-      <Paper 
-        elevation={2} 
-        sx={{ 
-          p: 4, 
+      <Paper
+        elevation={2}
+        sx={{
+          p: 4,
           mt: 4,
-          background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.1), rgba(123, 137, 244, 0.1))',
-          border: '1px solid rgba(100, 255, 218, 0.2)',
+          background:
+            "linear-gradient(135deg, rgba(100, 255, 218, 0.1), rgba(123, 137, 244, 0.1))",
+          border: "1px solid rgba(100, 255, 218, 0.2)",
         }}
       >
         <Typography variant="h5" gutterBottom>
           Next Available Project
         </Typography>
         {nextProject ? (
-          <ProjectView 
-            project={nextProject} 
+          <ProjectView
+            project={nextProject}
             onSubmit={fetchNextProject}
             onSubmitSuccess={handleProjectSubmitSuccess}
           />
         ) : (
           <Typography variant="body1" color="text.secondary">
-            No projects available at your current level. Keep evaluating to level up!
+            No projects available at your current level. Keep evaluating to
+            level up!
           </Typography>
         )}
       </Paper>
 
       {/* Evaluation Pool Section */}
       <Paper elevation={2} sx={{ p: 3, mt: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
           <Typography variant="h5" component="h2">
             Evaluation Pool
           </Typography>
-          <Chip 
+          <Chip
             label={`${projects.length} Projects Available`}
             color="primary"
             variant="outlined"
@@ -216,8 +258,8 @@ const Dashboard: React.FC = () => {
               <ListItem
                 sx={{
                   py: 2,
-                  '&:hover': {
-                    bgcolor: 'action.hover',
+                  "&:hover": {
+                    bgcolor: "action.hover",
                   },
                 }}
               >
@@ -227,36 +269,37 @@ const Dashboard: React.FC = () => {
                       {project.project.title}
                     </Typography>
                   }
-                  secondaryTypographyProps={{ component: 'div' }}
+                  secondaryTypographyProps={{ component: "div" }}
                   secondary={
                     <>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary" 
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
                         component="div"
                         sx={{ mb: 1 }}
                       >
                         {project.project.description}
                       </Typography>
-                      <Box 
-                        component="div" 
-                        sx={{ 
-                          display: 'flex', 
-                          gap: 1, 
-                          alignItems: 'center' 
+                      <Box
+                        component="div"
+                        sx={{
+                          display: "flex",
+                          gap: 1,
+                          alignItems: "center",
                         }}
                       >
-                        <Chip 
+                        <Chip
                           label={`${project.project.points_required} Points Required`}
                           size="small"
                           color="secondary"
                         />
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary" 
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
                           component="span"
                         >
-                          Submitted: {new Date(project.created_at).toLocaleDateString()}
+                          Submitted:{" "}
+                          {new Date(project.created_at).toLocaleDateString()}
                         </Typography>
                       </Box>
                     </>
@@ -269,7 +312,9 @@ const Dashboard: React.FC = () => {
                   disabled={project.submitted_by.id === user?.id}
                   sx={{ ml: 2, minWidth: 120 }}
                 >
-                  {project.submitted_by.id === user?.id ? 'Your Submission' : 'Evaluate'}
+                  {project.submitted_by.id === user?.id
+                    ? "Your Submission"
+                    : "Evaluate"}
                 </Button>
               </ListItem>
             </React.Fragment>
@@ -278,7 +323,14 @@ const Dashboard: React.FC = () => {
             <ListItem>
               <ListItemText
                 primary={
-                  <Box component="div" sx={{ color: 'text.secondary', typography: 'body1', textAlign: 'center' }}>
+                  <Box
+                    component="div"
+                    sx={{
+                      color: "text.secondary",
+                      typography: "body1",
+                      textAlign: "center",
+                    }}
+                  >
                     No projects available for evaluation
                   </Box>
                 }
@@ -291,4 +343,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
