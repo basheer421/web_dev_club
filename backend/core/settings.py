@@ -138,8 +138,32 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# DigitalOcean Spaces Configuration
+USE_SPACES = os.getenv('USE_SPACES', 'False') == 'True'
+
+if USE_SPACES:
+    # Storage settings
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+    # Spaces credentials
+    AWS_ACCESS_KEY_ID = os.getenv('SPACES_ACCESS_KEY')
+    AWS_SECRET_ACCESS_KEY = os.getenv('SPACES_SECRET_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('SPACES_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL = f"https://{os.getenv('SPACES_REGION')}.digitaloceanspaces.com"
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_LOCATION = 'media'
+
+    # Generate URLs
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_LOCATION}/"
+else:
+    # Local storage settings
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

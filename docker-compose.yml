@@ -12,6 +12,11 @@ services:
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
+      - USE_SPACES=${USE_SPACES}
+      - SPACES_ACCESS_KEY=${SPACES_ACCESS_KEY}
+      - SPACES_SECRET_KEY=${SPACES_SECRET_KEY}
+      - SPACES_BUCKET_NAME=${SPACES_BUCKET_NAME}
+      - SPACES_REGION=${SPACES_REGION}
     depends_on:
       db:
         condition: service_healthy

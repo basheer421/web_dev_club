@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-# Create media and static directories
+# Create media and static directories (for local development)
 RUN mkdir -p media static
 
 # Create entrypoint script
