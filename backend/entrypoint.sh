@@ -7,12 +7,16 @@ else
     echo "Database is not ready"
 fi
 
+# Run migrations
 python manage.py migrate
+
+# Collect static files
 python manage.py collectstatic --noinput
 
-if [ "$USE_SPACES" != "True" ]; then
-    # Ensure media directory exists for local development
-    mkdir -p media
-fi
-
-exec gunicorn core.wsgi:application --bind 0.0.0.0:8000
+# Start Gunicorn
+exec gunicorn core.wsgi:application \
+    --bind 0.0.0.0:8000 \
+    --workers 3 \
+    --timeout 120 \
+    --access-logfile - \
+    --error-logfile -

@@ -4,15 +4,16 @@
 help:
 	@echo "Available commands:"
 	@echo "  make build          - Build all services"
-	@echo "  make up            - Start all services"
-	@echo "  make down          - Stop all services"
-	@echo "  make restart       - Restart all services"
-	@echo "  make logs          - View logs of all services"
-	@echo "  make shell         - Open Django shell"
-	@echo "  make migrate       - Run Django migrations"
+	@echo "  make up             - Start all services"
+	@echo "  make down           - Stop all services"
+	@echo "  make restart        - Restart all services"
+	@echo "  make logs           - View logs of all services"
+	@echo "  make shell          - Open Django shell"
+	@echo "  make migrate        - Run Django migrations"
 	@echo "  make createsuperuser - Create Django superuser"
-	@echo "  make test          - Run Django tests"
+	@echo "  make test           - Run Django tests"
 	@echo "  make clean         - Remove all containers and volumes"
+	@echo "  make ps            - Show all running containers"
 
 # Build the services
 build:
@@ -60,4 +61,7 @@ clean:
 # Development shortcuts
 dev-build: build up migrate
 
-dev-rebuild: clean build up migrate 
+dev-rebuild: clean build up migrate
+
+ps:
+	docker compose ps
