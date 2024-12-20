@@ -1,19 +1,22 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {
-    port: 3000,
     host: true,
-    watch: {
-      usePolling: true
-    }
+    port: 3000,
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: true,
+    chunkSizeWarningLimit: 1000,
+  }
 })

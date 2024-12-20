@@ -1,67 +1,50 @@
-.PHONY: build up down restart logs shell migrate createsuperuser test clean help
+.PHONY: backend-up backend-down frontend-up frontend-down up down build logs
 
-# Default target
 help:
-	@echo "Available commands:"
-	@echo "  make build          - Build all services"
-	@echo "  make up             - Start all services"
-	@echo "  make down           - Stop all services"
-	@echo "  make restart        - Restart all services"
-	@echo "  make logs           - View logs of all services"
-	@echo "  make shell          - Open Django shell"
-	@echo "  make migrate        - Run Django migrations"
-	@echo "  make createsuperuser - Create Django superuser"
-	@echo "  make test           - Run Django tests"
-	@echo "  make clean         - Remove all containers and volumes"
-	@echo "  make ps            - Show all running containers"
+	@echo "Usage: make [command]"
+	@echo "Commands:"
+	@echo "  up: Start backend and frontend services"
+	@echo "  down: Stop backend and frontend services"
+	@echo "  build: Build backend and frontend services"
+	@echo "  logs: View logs for backend and frontend services"
 
-# Build the services
-build:
-	docker compose build
+# Backend commands
+backend-up:
+	cd backend && docker compose up -d
 
-# Start the services
-up:
-	docker compose up -d
+backend-down:
+	cd backend && docker compose down
 
-# Stop the services
-down:
-	docker compose down
+backend-build:
+	cd backend && docker compose build
 
-# Restart the services
-restart:
-	docker compose restart
+backend-logs:
+	cd backend && docker compose logs -f
 
-# View the logs
-logs:
-	docker compose logs -f
+# Frontend commands
+frontend-up:
+	cd frontend && docker compose up -d
 
-# Open Django shell
-shell:
-	docker compose exec backend python manage.py shell
+frontend-down:
+	cd frontend && docker compose down
 
-# Run migrations
-migrate:
-	docker compose exec backend python manage.py makemigrations
-	docker compose exec backend python manage.py migrate
+frontend-build:
+	cd frontend && docker compose build
 
-# Create superuser
-createsuperuser:
-	docker compose exec backend python manage.py createsuperuser
+frontend-logs:
+	cd frontend && docker compose logs -f
 
-# Run tests
-test:
-	docker compose exec backend python manage.py test
+# Combined commands
+up: backend-up frontend-up
 
-# Clean up everything
-clean:
-	docker system prune -a --volumes -f
-	find . -type d -name "__pycache__" -exec rm -r {} +
-	find . -type f -name "*.pyc" -delete
+re: backend-down backend-build backend-up frontend-down frontend-build frontend-up
 
-# Development shortcuts
-dev-build: build up migrate
+down: frontend-down backend-down
 
-dev-rebuild: clean build up migrate
+build: backend-build frontend-build
 
 ps:
-	docker compose ps
+	docker ps
+
+logs:
+	cd backend && docker compose logs -f & cd frontend && docker compose logs -f
