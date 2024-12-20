@@ -3,10 +3,10 @@
 help:
 	@echo "Usage: make [command]"
 	@echo "Commands:"
-	@echo "  up: Start backend and frontend services"
-	@echo "  down: Stop backend and frontend services"
-	@echo "  build: Build backend and frontend services"
-	@echo "  logs: View logs for backend and frontend services"
+	@echo "  up: Start backend services"
+	@echo "  down: Stop backend services"
+	@echo "  build: Build backend services"
+	@echo "  logs: View logs for backend services"
 
 # Backend commands
 backend-up:
@@ -21,27 +21,14 @@ backend-build:
 backend-logs:
 	cd backend && docker compose logs -f
 
-# Frontend commands
-frontend-up:
-	cd frontend && docker compose up -d
-
-frontend-down:
-	cd frontend && docker compose down
-
-frontend-build:
-	cd frontend && docker compose build
-
-frontend-logs:
-	cd frontend && docker compose logs -f
-
 # Combined commands
-up: backend-up frontend-up
+up: backend-up
 
-re: backend-down backend-build backend-up frontend-down frontend-build frontend-up
+re: backend-down backend-build backend-up
 
-down: frontend-down backend-down
+down: backend-down
 
-build: backend-build frontend-build
+build: backend-build
 
 ps:
 	docker ps
