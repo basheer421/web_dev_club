@@ -8,7 +8,10 @@ RUN apt-get update && \
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/
-COPY init-letsencrypt.sh /docker-entrypoint.d/
 
-# Make the init script executable
-RUN chmod +x /docker-entrypoint.d/init-letsencrypt.sh
+# Copy and set up init script
+COPY init-letsencrypt.sh /init-letsencrypt.sh
+RUN chmod +x /init-letsencrypt.sh
+
+# Use the init script as the entrypoint
+ENTRYPOINT ["/init-letsencrypt.sh"]
