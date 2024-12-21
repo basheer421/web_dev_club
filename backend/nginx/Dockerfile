@@ -1,8 +1,8 @@
 FROM nginx:1.25
 
-# Install certbot and its nginx plugin
+# Install certbot, its nginx plugin, and cron
 RUN apt-get update && \
-    apt-get install -y python3-certbot-nginx && \
+    apt-get install -y python3-certbot-nginx cron && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
