@@ -143,9 +143,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'core/static'),
-]
 
 # Storage Configuration
 USE_SPACES = os.getenv('USE_SPACES', 'False') == 'True'
@@ -214,9 +211,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://42devspace.tech",
     "https://www.42devspace.tech",
     "https://42devspace.netlify.app",
-    "https://42devspace.duckdns.org"
-    "http://42devspace.duckdns.org"
 ]
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -257,9 +253,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://42devspace.tech',
     'https://www.42devspace.tech',
     'https://42devspace.netlify.app',
-    'https://42devspace.duckdns.org',
-    'http://42devspace.duckdns.org'
 ]
+
 CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_HTTPONLY = False
