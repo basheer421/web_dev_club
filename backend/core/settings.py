@@ -29,8 +29,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '143.244.128.167',
-    'api.42devspace.tech',
+    'api.42devspace.tech'
 ]
 
 
