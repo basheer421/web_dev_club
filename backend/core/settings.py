@@ -212,7 +212,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "https://42devspace.tech",
     "https://www.42devspace.tech",
-    "https://42devspace.netlify.app"
+    "https://42devspace.netlify.app",
+    "https://42devspace.duckdns.org"
+    "http://42devspace.duckdns.org"
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
@@ -253,7 +255,9 @@ CSRF_TRUSTED_ORIGINS = [
     'http://64.227.160.198:8000',
     'https://42devspace.tech',
     'https://www.42devspace.tech',
-    'https://42devspace.netlify.app'
+    'https://42devspace.netlify.app',
+    'https://42devspace.duckdns.org',
+    'http://42devspace.duckdns.org'
 ]
 CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
