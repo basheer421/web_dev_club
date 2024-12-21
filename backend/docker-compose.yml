@@ -26,8 +26,11 @@ services:
     build: ./nginx
     volumes:
       - static_volume:/app/staticfiles
+      - ./nginx/conf:/etc/nginx/conf.d
+      - letsencrypt:/etc/letsencrypt
     ports:
-      - 80:80
+      - "80:80"
+      - "443:443"
     depends_on:
       - backend
 
@@ -47,4 +50,5 @@ services:
 
 volumes:
   postgres_data:
-  static_volume: 
+  static_volume:
+  letsencrypt:
