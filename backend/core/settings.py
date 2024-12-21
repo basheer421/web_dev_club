@@ -253,6 +253,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://42devspace.tech',
     'https://www.42devspace.tech',
     'https://42devspace.netlify.app',
+    'https://42devspace.duckdns.org',
 ]
 
 CSRF_COOKIE_SECURE = False
