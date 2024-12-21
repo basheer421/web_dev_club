@@ -7,3 +7,5 @@ certbot certonly --standalone \
   --email bammar@student.42abudhabi.ae \
   --domains 42devspace.duckdns.org
 
+# Start nginx in foreground mode
+exec nginx -g 'daemon off;'
