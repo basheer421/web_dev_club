@@ -2,12 +2,9 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://api.yourdomain.com/api',
-  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'xsrfCookieName': 'csrftoken',
-    'xsrfHeaderName': 'X-CSRFToken',
   }
 });
 

@@ -19,15 +19,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
-  nginx:
-    build: ./nginx
-    volumes:
-      - static_volume:/app/static
     ports:
-      - "80:80"
-    depends_on:
-      - backend
+      - 8000:8000
 
   db:
     image: postgres:13

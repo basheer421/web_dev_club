@@ -24,9 +24,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-secret-key-here')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '64.227.160.198',
+    '42devspace.tech',
+    'www.42devspace.tech',
+    '42devspace.netlify.app'
+]
 
 
 # Application definition
@@ -56,6 +63,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -135,18 +143,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'core/static'),
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # DigitalOcean Spaces Configuration
 USE_SPACES = os.getenv('USE_SPACES', 'False') == 'True'
 
 if USE_SPACES:
-    # Storage settings
+    # Storage settings for Media files only
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
-
+    
     # Spaces credentials
     AWS_ACCESS_KEY_ID = os.getenv('SPACES_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = os.getenv('SPACES_SECRET_KEY')
@@ -157,13 +170,13 @@ if USE_SPACES:
     }
     AWS_DEFAULT_ACL = 'public-read'
     AWS_LOCATION = 'media'
-
-    # Generate URLs
+    
+    # Media files URL
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_LOCATION}/"
 else:
-    # Local storage settings
+    # Local media settings (fallback)
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -187,10 +200,35 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://42devspace.tech",
+    "https://www.42devspace.tech",
+    "https://42devspace.netlify.app"
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Authentication settings
 AUTHENTICATION_BACKENDS = [
@@ -200,26 +238,17 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-# Google OAuth2 settings
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': os.getenv('GOOGLE_CLIENT_ID'),
-            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),
-            'key': ''
-        },
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
-    }
-}
-
 # Add CSRF settings
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:3000', 'http://127.0.0.1:3000']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://64.227.160.198:8000',
+    'https://42devspace.tech',
+    'https://www.42devspace.tech',
+    'https://42devspace.netlify.app'
+]
 CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_HTTPONLY = False

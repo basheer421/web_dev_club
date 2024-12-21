@@ -1,7 +1,8 @@
 #!/bin/bash
 
 echo "Waiting for database..."
-if [ python manage.py shell -c "from django.db import django; print(django.db.connection.ensure_connection())" ]; then
+python manage.py shell -c "from django.db import django; print(django.db.connection.ensure_connection())"
+if [ $? -eq 0 ]; then
     echo "Database is ready"
 else
     echo "Database is not ready"
@@ -10,8 +11,8 @@ fi
 # Run migrations
 python manage.py migrate
 
-# Collect static files
-python manage.py collectstatic --noinput
+# Collect static files with --clear flag to ensure clean collection
+python manage.py collectstatic --noinput --clear
 
 # Start Gunicorn
 exec gunicorn core.wsgi:application \
