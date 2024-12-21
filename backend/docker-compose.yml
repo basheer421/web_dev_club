@@ -26,7 +26,7 @@ services:
     build: ./nginx
     volumes:
       - static_volume:/app/staticfiles
-      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/sites-available:/etc/nginx/sites-available
       - letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
