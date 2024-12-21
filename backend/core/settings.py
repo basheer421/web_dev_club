@@ -30,11 +30,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '143.244.128.167',
-    'yourdomain.com',
-    '64.227.160.198',
-    '42devspace.tech',
-    'www.42devspace.tech',
-    '42devspace.netlify.app'
+    'api.42devspace.tech',
 ]
 
 
