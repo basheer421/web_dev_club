@@ -1,12 +1,15 @@
 #!/bin/bash
 
 echo "Waiting for database..."
-python manage.py shell -c "from django.db import django; print(django.db.connection.ensure_connection())"
+python manage.py shell -c "from django.db import connection; connection.ensure_connection()"
 if [ $? -eq 0 ]; then
     echo "Database is ready"
 else
     echo "Database is not ready"
 fi
+
+# Create static directory if it doesn't exist
+mkdir -p staticfiles
 
 # Run migrations
 python manage.py migrate

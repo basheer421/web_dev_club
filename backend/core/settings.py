@@ -144,37 +144,46 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'core/static'),
 ]
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
-# DigitalOcean Spaces Configuration
+# Storage Configuration
 USE_SPACES = os.getenv('USE_SPACES', 'False') == 'True'
 
 if USE_SPACES:
-    # Storage settings for Media files only
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    
-    # Spaces credentials
-    AWS_ACCESS_KEY_ID = os.getenv('SPACES_ACCESS_KEY')
-    AWS_SECRET_ACCESS_KEY = os.getenv('SPACES_SECRET_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.getenv('SPACES_BUCKET_NAME')
-    AWS_S3_ENDPOINT_URL = f"https://{os.getenv('SPACES_REGION')}.digitaloceanspaces.com"
-    AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
+    # DigitalOcean Spaces Configuration
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": os.getenv('SPACES_ACCESS_KEY'),
+                "secret_key": os.getenv('SPACES_SECRET_KEY'),
+                "bucket_name": os.getenv('SPACES_BUCKET_NAME'),
+                "endpoint_url": f"https://{os.getenv('SPACES_REGION')}.digitaloceanspaces.com",
+                "object_parameters": {
+                    "CacheControl": "max-age=86400",
+                },
+                "default_acl": "public-read",
+                "location": "media",
+            }
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        }
     }
-    AWS_DEFAULT_ACL = 'public-read'
-    AWS_LOCATION = 'media'
-    
-    # Media files URL
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_LOCATION}/"
+    MEDIA_URL = f"https://{os.getenv('SPACES_REGION')}.digitaloceanspaces.com/{os.getenv('SPACES_BUCKET_NAME')}/media/"
 else:
-    # Local media settings (fallback)
+    # Local storage settings
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        }
+    }
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
