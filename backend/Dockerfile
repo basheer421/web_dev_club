@@ -11,19 +11,18 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
-COPY . .
-
-# Create media and static directories (for local development)
+# Create media and static directories
 RUN mkdir -p media static core/static
+
+# Create user and set permissions
+RUN useradd -m myuser
+COPY . .
+RUN chown -R myuser:myuser /app
+RUN chmod -R 755 /app  # Add write permissions
+USER myuser
 
 # Create entrypoint script
 COPY ./entrypoint.sh .
 RUN chmod +x entrypoint.sh
-
-# Run as non-root user
-RUN useradd -m myuser
-RUN chown -R myuser:myuser /app
-USER myuser
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
