@@ -64,7 +64,7 @@ const Landing: React.FC = () => {
               fontWeight: 700,
             }}
           >
-            DevClub
+            DevSpace
           </Typography>
           <Box>
             <Button
@@ -128,7 +128,7 @@ const Landing: React.FC = () => {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              DevClub
+              DevSpace
             </Typography>
           </motion.div>
 

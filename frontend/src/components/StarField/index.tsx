@@ -12,7 +12,6 @@ interface Star {
 const StarField: React.FC = () => {
   const stars = useMemo(() => {
     const starCount = 50 + Math.floor(screen.width * screen.height / 100000); // Adjust number of stars based on screen size
-    console.log(starCount);
     return Array.from({ length: starCount }, (): Star => ({
       size: Math.random() * 5 + 2, // Random size between 1-4px
       x: Math.random() * 100, // Random position X (0-100%)

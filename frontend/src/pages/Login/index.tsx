@@ -66,7 +66,7 @@ const Login: React.FC = () => {
       <BackToHome />
       <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
         <Typography component="h1" variant="h5" align="center">
-          Sign in to DevClub
+          Sign in to DevSpace
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <TextField
