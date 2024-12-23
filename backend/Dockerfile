@@ -20,10 +20,5 @@ RUN useradd -m myuser
 # Copy project files and set permissions
 COPY . .
 RUN chmod +x entrypoint.sh
-RUN chown -R myuser:myuser /app
-RUN chmod -R 755 /app
-
-# Switch to non-root user
-USER myuser
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
