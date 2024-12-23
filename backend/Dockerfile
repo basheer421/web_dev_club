@@ -14,8 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Create media and static directories
 RUN mkdir -p media static core/static
 
-# Create user
-RUN useradd -m myuser
+RUN chmod -R 755 /app
 
 # Copy project files and set permissions
 COPY . .
