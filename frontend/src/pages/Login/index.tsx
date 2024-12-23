@@ -28,14 +28,15 @@ const Login: React.FC = () => {
   });
   const [error, setError] = useState<string>("");
   const [showError, setShowError] = useState(false);
+  const token = localStorage.getItem("token");
 
   const from = location.state?.from?.pathname || "/dashboard";
 
   useEffect(() => {
-    if (user) {
+    if (token && user) {
       navigate(from, { replace: true });
     }
-  }, [user, navigate, from]);
+  }, [token, user, navigate, from]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
