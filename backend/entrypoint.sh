@@ -11,6 +11,8 @@ fi
 # Create static directory if it doesn't exist
 mkdir -p staticfiles
 
+python manage.py makemigrations
+
 # Run migrations
 python manage.py migrate
 
